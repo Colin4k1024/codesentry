@@ -1,0 +1,18 @@
+id: CPP_BUFFER_OVERFLOW
+name: Buffer Overflow Risk
+description: Detects potentially unsafe buffer operations
+severity: SEVERE
+category: security
+languages:
+  - cpp
+suggestion: Use safe string functions (strncpy, snprintf) or std::string
+patterns:
+  - type: regex
+    pattern: '(?i)\bstrcpy\s*\('
+    comment: Unsafe strcpy - use strncpy or std::string instead
+  - type: regex
+    pattern: '(?i)\bsprintf\s*\('
+    comment: Unsafe sprintf - use snprintf instead
+  - type: regex
+    pattern: '(?i)\bgets\s*\('
+    comment: Dangerous gets() - removed in C11, use fgets

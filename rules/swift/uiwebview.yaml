@@ -1,0 +1,12 @@
+id: SWIFT_UIWEBVIEW
+name: Deprecated UIWebView
+description: Detects use of deprecated UIWebView
+severity: WARNING
+category: security
+languages:
+  - swift
+suggestion: Use WKWebView instead of UIWebView
+patterns:
+  - type: regex
+    pattern: 'UIWebView'
+    comment: Deprecated UIWebView - use WKWebView instead

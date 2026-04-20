@@ -1,0 +1,18 @@
+id: PHP_DESERIALIZATION
+name: Dangerous Deserialization
+description: Detects unsafe unserialize() calls
+severity: SEVERE
+category: security
+languages:
+  - php
+suggestion: Use json_decode for data exchange, never unserialize user input
+patterns:
+  - type: regex
+    pattern: 'unserialize\s*\('
+    comment: Dangerous unserialize - can lead to code execution
+  - type: regex
+    pattern: '(?i)eval\s*\('
+    comment: Dangerous eval usage
+  - type: regex
+    pattern: '(?i)assert\s*\('
+    comment: Dangerous assert - can lead to code execution

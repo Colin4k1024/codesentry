@@ -1,0 +1,18 @@
+id: PHP_SQL_INJECTION
+name: SQL Injection
+description: Detects string concatenation in SQL queries in PHP
+severity: SEVERE
+category: security
+languages:
+  - php
+suggestion: Use parameterized queries (PDO, mysqli_stmt)
+patterns:
+  - type: regex
+    pattern: '(?i)(query|execute|prepare)\s*\([^)]*\.\s*\$'
+    comment: String concatenation in SQL query
+  - type: regex
+    pattern: '(?i)mysqli?_query\s*\([^)]*\.\s*\)'
+    comment: String concatenation in SQL query
+  - type: regex
+    pattern: '"[^"]*SELECT[^"]*"\s*\.\s*\$'
+    comment: String concatenation in SQL query

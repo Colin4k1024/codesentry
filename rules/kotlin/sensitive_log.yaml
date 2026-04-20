@@ -1,0 +1,12 @@
+id: KT_SENSITIVE_LOG
+name: Sensitive Data Logging
+description: Detects sensitive data in log statements
+severity: SEVERE
+category: security
+languages:
+  - kotlin
+suggestion: Remove sensitive fields from log statements
+patterns:
+  - type: regex
+    pattern: '(?i)(log|logger|println|print|Log)\.[dwvie]\([^)]*(password|token|secret|key)'
+    comment: Possible sensitive data in log

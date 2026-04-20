@@ -1,0 +1,15 @@
+id: RS_SENSITIVE_LOG
+name: Sensitive Data Logging
+description: Detects sensitive data in println or log macros
+severity: SEVERE
+category: security
+languages:
+  - rust
+suggestion: Remove sensitive fields from log statements
+patterns:
+  - type: regex
+    pattern: '(?i)println!\s*\([^)]*(password|token|secret|key)'
+    comment: Possible sensitive data in println
+  - type: regex
+    pattern: '(?i)log::(debug|info|warn|error)!([^)]*(password|token|secret|key))'
+    comment: Possible sensitive data in log macro

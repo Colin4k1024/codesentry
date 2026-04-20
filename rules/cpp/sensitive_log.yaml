@@ -1,0 +1,12 @@
+id: CPP_SENSITIVE_LOG
+name: Sensitive Data Logging
+description: Detects sensitive data in printf or cout statements
+severity: SEVERE
+category: security
+languages:
+  - cpp
+suggestion: Remove sensitive fields from log statements
+patterns:
+  - type: regex
+    pattern: '(?i)(printf|cout|logging)\b[^;]*(password|token|secret|key)'
+    comment: Possible sensitive data in log

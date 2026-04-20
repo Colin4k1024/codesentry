@@ -1,0 +1,15 @@
+id: RS_SQL_INJECTION
+name: SQL Injection
+description: Detects string concatenation in SQL queries in Rust
+severity: SEVERE
+category: security
+languages:
+  - rust
+suggestion: Use parameterized queries
+patterns:
+  - type: regex
+    pattern: '(?i)(query|execute|run)\s*\([^)]*\+[^)]*\)'
+    comment: String concatenation in SQL query
+  - type: regex
+    pattern: 'format!\s*\([^)]*SELECT[^)]*\{'
+    comment: String formatting in SQL query

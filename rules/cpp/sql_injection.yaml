@@ -1,0 +1,12 @@
+id: CPP_SQL_INJECTION
+name: SQL Injection
+description: Detects string concatenation in SQL queries in C++
+severity: SEVERE
+category: security
+languages:
+  - cpp
+suggestion: Use parameterized queries or prepared statements
+patterns:
+  - type: regex
+    pattern: '(?i)(query|execute|prepare)\s*\([^)]*\+[^)]*\)'
+    comment: String concatenation in SQL query

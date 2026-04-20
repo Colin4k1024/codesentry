@@ -1,0 +1,12 @@
+id: KT_SQL_INJECTION
+name: SQL Injection
+description: Detects string concatenation in SQL queries in Kotlin
+severity: SEVERE
+category: security
+languages:
+  - kotlin
+suggestion: Use parameterized queries or an ORM
+patterns:
+  - type: regex
+    pattern: '(?i)(execute|query|rawQuery)\s*\([^)]*\+[^)]*\)'
+    comment: String concatenation in SQL query

@@ -1,0 +1,12 @@
+id: PHP_SENSITIVE_LOG
+name: Sensitive Data Logging
+description: Detects sensitive data in echo or log statements
+severity: SEVERE
+category: security
+languages:
+  - php
+suggestion: Remove sensitive fields from log statements
+patterns:
+  - type: regex
+    pattern: '(?i)(echo|print|print_r|var_dump|error_log)\([^)]*(password|token|secret|key)'
+    comment: Possible sensitive data in output
