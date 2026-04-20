@@ -5,4 +5,10 @@ severity: WARNING
 category: performance
 languages: [go]
 suggestion: Use errgroup or context to manage goroutine lifecycle
-patterns: []
+patterns:
+  - type: regex
+    pattern: 'go\s+func\s*\('
+    comment: Goroutine without lifecycle management
+  - type: ast
+    language: go
+    query: '(*ast.GoStmt).Go' 
