@@ -1,0 +1,11 @@
+id: SQL_INJECTION
+name: SQL Injection
+description: Detects potential SQL injection vulnerabilities
+severity: SEVERE
+category: security
+languages: [go, javascript, python]
+suggestion: Use parameterized queries instead of string formatting for SQL queries
+patterns:
+  - type: regex
+    pattern: '(SELECT|INSERT|UPDATE|DELETE).*\+'
+    comment: String concatenation in SQL query

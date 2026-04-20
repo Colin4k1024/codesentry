@@ -1,0 +1,8 @@
+id: CONTEXT_LEAK
+name: Context Leak
+description: Detects context being passed to goroutines after cancellation
+severity: SEVERE
+category: security
+languages: [go]
+suggestion: Use a copy of context or pass context with timeout to goroutines
+patterns: []

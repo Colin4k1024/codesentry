@@ -1,0 +1,8 @@
+id: GOROUTINE_LEAK
+name: Goroutine Leak
+description: Detects goroutines started without proper lifecycle management
+severity: WARNING
+category: performance
+languages: [go]
+suggestion: Use errgroup or context to manage goroutine lifecycle
+patterns: []

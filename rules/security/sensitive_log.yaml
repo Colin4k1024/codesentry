@@ -1,0 +1,11 @@
+id: SENSITIVE_LOG
+name: Sensitive Data Logging
+description: Detects logging of sensitive data
+severity: SEVERE
+category: security
+languages: [go, javascript, python]
+suggestion: Remove sensitive fields from log statements
+patterns:
+  - type: regex
+    pattern: '(log\.|console\.|fmt\.Print|print\().*(password|token|secret|key)'
+    comment: Possible sensitive data in log
