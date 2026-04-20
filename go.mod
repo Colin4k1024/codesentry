@@ -1,4 +1,4 @@
-module github.com/goreview/goreview
+module github.com/Colin4k1024/codesentry
 
 go 1.21
 

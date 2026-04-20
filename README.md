@@ -1,4 +1,4 @@
-# GoReview
+# CodeSentry
 
 A fast, extensible static analysis and code review tool with support for **11 programming languages**.
 
@@ -19,32 +19,32 @@ A fast, extensible static analysis and code review tool with support for **11 pr
 ### From Source
 
 ```bash
-git clone https://github.com/Colin4k1024/goreview_refactor.git
-cd goreview_refactor
-go build -o goreview ./cmd/goreview
+git clone https://github.com/Colin4k1024/codesentry_refactor.git
+cd codesentry_refactor
+go build -o codesentry ./cmd/codesentry
 ```
 
 ### Pre-built Binary
 
-Download from the [Releases](https://github.com/Colin4k1024/goreview_refactor/releases) page.
+Download from the [Releases](https://github.com/Colin4k1024/codesentry_refactor/releases) page.
 
 ## Quick Start
 
 ```bash
 # Scan a directory for security issues
-./goreview scan ./src --security
+./codesentry scan ./src --security
 
 # Scan with all rules
-./goreview scan ./src
+./codesentry scan ./src
 
 # Scan with performance rules
-./goreview scan ./src --performance
+./codesentry scan ./src --performance
 
 # Output to JSON
-./goreview scan ./src --security -o results.json
+./codesentry scan ./src --security -o results.json
 
 # List supported languages
-./goreview languages
+./codesentry languages
 ```
 
 ## Supported Languages
@@ -118,8 +118,8 @@ patterns:
 ## Architecture
 
 ```
-goreview/
-├── cmd/goreview/     # CLI entry point
+codesentry/
+├── cmd/codesentry/     # CLI entry point
 ├── internal/
 │   ├── engine/       # Scanning engine
 │   ├── parser/       # Parser registry
@@ -142,8 +142,8 @@ package <lang>
 import (
     "regexp"
     "strings"
-    parserpkg "github.com/goreview/goreview/internal/parser"
-    "github.com/goreview/goreview/internal/rules"
+    parserpkg "github.com/Colin4k1024/codesentry/internal/parser"
+    "github.com/Colin4k1024/codesentry/internal/rules"
 )
 
 func init() {
@@ -160,25 +160,25 @@ func (p *Parser) Parse(filePath string, content []byte, langRules []rules.Rule) 
 }
 ```
 
-2. Register in `cmd/goreview/langs.go`:
+2. Register in `cmd/codesentry/langs.go`:
 ```go
-import _ "github.com/goreview/goreview/langs/<lang>"
+import _ "github.com/Colin4k1024/codesentry/langs/<lang>"
 ```
 
 3. Add rules in `rules/<lang>/`
 
 4. Build and test:
 ```bash
-go build -o goreview ./cmd/goreview
-./goreview languages  # Verify language appears
-./goreview scan /tmp/test.<ext> --security  # Test
+go build -o codesentry ./cmd/codesentry
+./codesentry languages  # Verify language appears
+./codesentry scan /tmp/test.<ext> --security  # Test
 ```
 
 ## Output Formats
 
 ### Text (Default)
 ```
-=== GoReview Scan Results ===
+=== CodeSentry Scan Results ===
 Files scanned: 3
 Total issues: 5
   SEVERE:   3
@@ -217,21 +217,21 @@ Duration: 1.5ms
 
 ### GitHub Actions
 ```yaml
-- name: Run GoReview
+- name: Run CodeSentry
   run: |
-    curl -sL https://github.com/Colin4k1024/goreview_refactor/releases/latest/download/goreview_linux_amd64 -o goreview
-    chmod +x goreview
-    ./goreview scan ./src --security -o goreview-results.json
+    curl -sL https://github.com/Colin4k1024/codesentry_refactor/releases/latest/download/codesentry_linux_amd64 -o codesentry
+    chmod +x codesentry
+    ./codesentry scan ./src --security -o codesentry-results.json
 ```
 
 ### GitLab CI
 ```yaml
-goreview:
+codesentry:
   script:
-    - ./goreview scan ./src --security -o goreview-results.sarif
+    - ./codesentry scan ./src --security -o codesentry-results.sarif
   artifacts:
     reports:
-      sast: goreview-results.sarif
+      sast: codesentry-results.sarif
 ```
 
 ## License

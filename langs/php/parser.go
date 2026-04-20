@@ -4,8 +4,8 @@ import (
 	"regexp"
 	"strings"
 
-	parserpkg "github.com/goreview/goreview/internal/parser"
-	"github.com/goreview/goreview/internal/rules"
+	parserpkg "github.com/Colin4k1024/codesentry/internal/parser"
+	"github.com/Colin4k1024/codesentry/internal/rules"
 )
 
 func init() {

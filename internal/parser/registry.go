@@ -1,6 +1,6 @@
 package parser
 
-import "github.com/goreview/goreview/internal/rules"
+import "github.com/Colin4k1024/codesentry/internal/rules"
 
 // Parser is implemented by language-specific parsers
 type Parser interface {

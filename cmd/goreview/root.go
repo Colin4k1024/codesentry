@@ -10,19 +10,19 @@ import (
 var version = "0.3.0"
 
 var rootCmd = &cobra.Command{
-	Use:   "goreview",
-	Short: "GoReview - AI-powered multi-language code review tool",
-	Long: `GoReview is a static analysis and AI-powered code review tool that supports
+	Use:   "codesentry",
+	Short: "CodeSentry - AI-powered multi-language code review tool",
+	Long: `CodeSentry is a static analysis and AI-powered code review tool that supports
 multiple programming languages including Go, JavaScript/TypeScript, Python, and more.
 
 Examples:
-  goreview scan ./...
-  goreview scan --security --performance
-  goreview languages
-  goreview version
+  codesentry scan ./...
+  codesentry scan --security --performance
+  codesentry languages
+  codesentry version
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Use 'goreview --help' for more information")
+		fmt.Println("Use 'codesentry --help' for more information")
 	},
 }
 
@@ -36,9 +36,9 @@ func Execute() {
 func init() {
 	rootCmd.AddCommand(&cobra.Command{
 		Use:   "version",
-		Short: "Print the version number of GoReview",
+		Short: "Print the version number of CodeSentry",
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Printf("GoReview version %s\n", version)
+			fmt.Printf("CodeSentry version %s\n", version)
 		},
 	})
 }

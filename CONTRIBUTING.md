@@ -1,4 +1,4 @@
-# Contributing to GoReview
+# Contributing to CodeSentry
 
 Thank you for your interest in contributing!
 
@@ -14,11 +14,11 @@ Thank you for your interest in contributing!
 
 ```bash
 # Clone the repository
-git clone https://github.com/Colin4k1024/goreview_refactor.git
-cd goreview_refactor
+git clone https://github.com/Colin4k1024/codesentry_refactor.git
+cd codesentry_refactor
 
 # Build
-go build -o goreview ./cmd/goreview
+go build -o codesentry ./cmd/codesentry
 
 # Run tests
 go test ./...
@@ -37,8 +37,8 @@ import (
     "regexp"
     "strings"
 
-    parserpkg "github.com/goreview/goreview/internal/parser"
-    "github.com/goreview/goreview/internal/rules"
+    parserpkg "github.com/Colin4k1024/codesentry/internal/parser"
+    "github.com/Colin4k1024/codesentry/internal/rules"
 )
 
 func init() {
@@ -85,9 +85,9 @@ func (p *Parser) Parse(filePath string, content []byte, langRules []rules.Rule) 
 
 ### 2. Register the Parser
 
-Add to `cmd/goreview/langs.go`:
+Add to `cmd/codesentry/langs.go`:
 ```go
-import _ "github.com/goreview/goreview/langs/<language>"
+import _ "github.com/Colin4k1024/codesentry/langs/<language>"
 ```
 
 ### 3. Add Rules
@@ -113,8 +113,8 @@ patterns:
 ### 4. Test
 
 ```bash
-go build -o goreview ./cmd/goreview
-./goreview languages  # Should list your new language
+go build -o codesentry ./cmd/codesentry
+./codesentry languages  # Should list your new language
 ```
 
 ## Rule YAML Schema
@@ -140,7 +140,7 @@ patterns:                # Detection patterns
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/language-support`)
 3. Make your changes
-4. Build and test (`go build && ./goreview scan ./...`)
+4. Build and test (`go build && ./codesentry scan ./...`)
 5. Commit with clear messages
 6. Push and open a PR
 

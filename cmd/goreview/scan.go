@@ -5,9 +5,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/goreview/goreview/internal/engine"
-	"github.com/goreview/goreview/internal/rules"
-	"github.com/goreview/goreview/internal/types"
+	"github.com/Colin4k1024/codesentry/internal/engine"
+	"github.com/Colin4k1024/codesentry/internal/rules"
+	"github.com/Colin4k1024/codesentry/internal/types"
 	"github.com/spf13/cobra"
 )
 
@@ -74,7 +74,7 @@ var scanCmd = &cobra.Command{
 }
 
 func outputResults(result *types.Result) {
-	fmt.Printf("\n=== GoReview Scan Results ===\n")
+	fmt.Printf("\n=== CodeSentry Scan Results ===\n")
 	fmt.Printf("Files scanned: %d\n", result.FilesScanned)
 	fmt.Printf("Total issues: %d\n", result.TotalIssues)
 	fmt.Printf("  SEVERE:   %d\n", result.Severe)

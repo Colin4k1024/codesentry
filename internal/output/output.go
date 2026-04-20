@@ -8,7 +8,7 @@ import (
 	"strings"
 	"text/tabwriter"
 
-	"github.com/goreview/goreview/internal/types"
+	"github.com/Colin4k1024/codesentry/internal/types"
 )
 
 // Format output format type
@@ -57,7 +57,7 @@ func Write(result *types.Result, format Format, outputPath string) error {
 
 func formatText(result *types.Result) []byte {
 	var sb strings.Builder
-	sb.WriteString("\n=== GoReview Scan Results ===\n")
+	sb.WriteString("\n=== CodeSentry Scan Results ===\n")
 	sb.WriteString(fmt.Sprintf("Files scanned: %d\n", result.FilesScanned))
 	sb.WriteString(fmt.Sprintf("Total issues: %d\n", result.TotalIssues))
 	sb.WriteString(fmt.Sprintf("  SEVERE:   %d\n", result.Severe))
@@ -94,9 +94,9 @@ func formatSarif(result *types.Result) ([]byte, error) {
 			{
 				"tool": map[string]interface{}{
 					"driver": map[string]interface{}{
-						"name":            "GoReview",
+						"name":            "CodeSentry",
 						"version":         "0.3.0",
-						"informationUri":  "https://github.com/goreview/goreview",
+						"informationUri":  "https://github.com/Colin4k1024/codesentry",
 						"rules":           []map[string]interface{}{},
 					},
 				},

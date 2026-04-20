@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/goreview/goreview/internal/parser"
+	"github.com/Colin4k1024/codesentry/internal/parser"
 	"github.com/spf13/cobra"
 )
 

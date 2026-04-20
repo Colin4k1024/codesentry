@@ -7,9 +7,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/goreview/goreview/internal/parser"
-	"github.com/goreview/goreview/internal/rules"
-	"github.com/goreview/goreview/internal/types"
+	"github.com/Colin4k1024/codesentry/internal/parser"
+	"github.com/Colin4k1024/codesentry/internal/rules"
+	"github.com/Colin4k1024/codesentry/internal/types"
 )
 
 // Config holds configuration for scanning

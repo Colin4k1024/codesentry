@@ -1,6 +1,6 @@
 # Rule Development Guide
 
-This guide explains how to write effective detection rules for GoReview.
+This guide explains how to write effective detection rules for CodeSentry.
 
 ## Rule YAML Structure
 
@@ -91,7 +91,7 @@ password = "hardcoded_secret_123"
 ### 2. Run the Scanner
 
 ```bash
-./goreview scan /tmp/test_rule.py --security
+./codesentry scan /tmp/test_rule.py --security
 ```
 
 ### 3. Verify Detection
