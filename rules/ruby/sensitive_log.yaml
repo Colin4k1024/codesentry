@@ -1,0 +1,15 @@
+id: RB_SENSITIVE_LOG
+name: Sensitive Data Logging
+description: Detects sensitive data in log statements
+severity: SEVERE
+category: security
+languages:
+  - ruby
+suggestion: Remove sensitive fields from log statements
+patterns:
+  - type: regex
+    pattern: '(?i)(puts|print|log|logger|rails)\b[^;]*(password|token|secret|key|auth)'
+    comment: Possible sensitive data in log
+  - type: regex
+    pattern: '(?i)Rails\.logger\.(debug|info|warn|error|fatal)\([^)]*(password|token|secret|key)'
+    comment: Possible sensitive data in Rails logger

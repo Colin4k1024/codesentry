@@ -1,0 +1,15 @@
+id: RB_SQL_INJECTION
+name: SQL Injection
+description: Detects string interpolation or concatenation in SQL queries in Ruby
+severity: SEVERE
+category: security
+languages:
+  - ruby
+suggestion: Use parameterized queries or an ORM
+patterns:
+  - type: regex
+    pattern: '(?i)(execute|query|exec|select|insert|update|delete).*#\{.*\}'
+    comment: String interpolation in SQL query
+  - type: regex
+    pattern: '(?i)(execute|query|exec)\s*\([^)]*\+[^)]*\)'
+    comment: String concatenation in SQL query

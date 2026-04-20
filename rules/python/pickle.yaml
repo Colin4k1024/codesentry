@@ -1,0 +1,18 @@
+id: PY_PICKLE
+name: Pickle Deserialization
+description: Detects insecure pickle deserialization
+severity: SEVERE
+category: security
+languages:
+  - python
+suggestion: Use JSON or a secure serialization format instead of pickle
+patterns:
+  - type: regex
+    pattern: 'pickle\.load\s*\('
+    comment: Insecure pickle deserialization
+  - type: regex
+    pattern: 'pickle\.loads\s*\('
+    comment: Insecure pickle deserialization
+  - type: regex
+    pattern: 'marshal\.load\s*\('
+    comment: Insecure marshal deserialization

@@ -1,0 +1,15 @@
+id: RB_YAML_LOAD
+name: Dangerous YAML Load
+description: Detects unsafe YAML deserialization
+severity: SEVERE
+category: security
+languages:
+  - ruby
+suggestion: Use YAML.safe_load instead of YAML.load
+patterns:
+  - type: regex
+    pattern: '(?i)YAML\.load\s*\('
+    comment: Dangerous YAML.load - can execute arbitrary code
+  - type: regex
+    pattern: '(?i)Psych\.load\s*\('
+    comment: Dangerous Psych.load - can execute arbitrary code

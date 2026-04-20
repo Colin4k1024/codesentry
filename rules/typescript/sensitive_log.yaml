@@ -1,0 +1,16 @@
+id: TS_SENSITIVE_LOG
+name: Sensitive Data Logging
+description: Detects sensitive data in console.log or logger calls
+severity: SEVERE
+category: security
+languages:
+  - typescript
+  - javascript
+suggestion: Remove sensitive fields from log statements
+patterns:
+  - type: regex
+    pattern: '(?i)(console|logger)\.(log|debug|info|warn|error)\([^)]*(password|token|secret|key|auth)[^)]*\)'
+    comment: Possible sensitive data in log
+  - type: regex
+    pattern: '(?i)process\.env\.\w+\s*\+\s*["\x27]'
+    comment: Environment variable concatenated in string

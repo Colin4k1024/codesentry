@@ -1,0 +1,15 @@
+id: JAVA_SQL_INJECTION
+name: SQL Injection
+description: Detects string concatenation in SQL queries in Java
+severity: SEVERE
+category: security
+languages:
+  - java
+suggestion: Use parameterized queries (PreparedStatement)
+patterns:
+  - type: regex
+    pattern: '(?i)(Statement|createStatement|executeQuery|executeUpdate)\s*\([^)]*\+[^)]*\)'
+    comment: String concatenation in SQL query
+  - type: regex
+    pattern: '(?i)String\s+\w+\s*=\s*"[^"]*SELECT[^"]*"\s*\+'
+    comment: String concatenation in SQL query

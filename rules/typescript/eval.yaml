@@ -1,0 +1,22 @@
+id: TS_EVAL
+name: Dangerous eval()
+description: Detects use of eval() which can execute arbitrary code
+severity: SEVERE
+category: security
+languages:
+  - typescript
+  - javascript
+suggestion: Avoid eval() - use safer alternatives
+patterns:
+  - type: regex
+    pattern: '(?i)\beval\s*\('
+    comment: Dangerous eval() usage
+  - type: regex
+    pattern: '(?i)\bFunction\s*\('
+    comment: Dynamic Function constructor - similar to eval
+  - type: regex
+    pattern: '(?i)\.innerHTML\s*='
+    comment: XSS innerHTML injection
+  - type: regex
+    pattern: '(?i)\bdangerouslySetInnerHTML\b'
+    comment: React dangerouslySetInnerHTML - ensure sanitization

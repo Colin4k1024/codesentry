@@ -1,0 +1,19 @@
+id: TS_SQL_INJECTION
+name: SQL Injection
+description: Detects string concatenation in SQL queries
+severity: SEVERE
+category: security
+languages:
+  - typescript
+  - javascript
+suggestion: Use parameterized queries or an ORM
+patterns:
+  - type: regex
+    pattern: '(?i)(query|execute|run)\s*\([^)]*\+[^)]*\)'
+    comment: String concatenation in SQL query
+  - type: regex
+    pattern: '(?i)`[^`]*\$\{[^}]*\+[^}]*\}[^`]*`'
+    comment: String concatenation in template literal SQL query
+  - type: regex
+    pattern: '(?i)template\s*`[^`]*SELECT[^`]*\$\{'
+    comment: Template literal in SQL query - verify parameterized

@@ -1,0 +1,15 @@
+id: JAVA_SENSITIVE_LOG
+name: Sensitive Data Logging
+description: Detects sensitive data in log statements
+severity: SEVERE
+category: security
+languages:
+  - java
+suggestion: Remove sensitive fields from log statements
+patterns:
+  - type: regex
+    pattern: '(?i)(log|logger|log4j|slf4j)\.\w+\([^)]*(password|token|secret|key|auth)[^)]*\)'
+    comment: Possible sensitive data in log
+  - type: regex
+    pattern: '(?i)System\.out\.print\(.*(password|token|secret)'
+    comment: Possible sensitive data in print statement

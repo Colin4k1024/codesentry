@@ -1,0 +1,15 @@
+id: PY_SENSITIVE_LOG
+name: Sensitive Data Logging
+description: Detects sensitive data in log statements
+severity: SEVERE
+category: security
+languages:
+  - python
+suggestion: Remove sensitive fields from log statements
+patterns:
+  - type: regex
+    pattern: '(?i)log(ging)?\.(debug|info|warning|error|critical)\([^)]*(password|token|secret|key|auth)[^)]*\)'
+    comment: Possible sensitive data in log
+  - type: regex
+    pattern: 'print\(f?["\x27][^"\x27]*(password|token|secret|key|auth)[^"\x27]*["\x27]'
+    comment: Possible sensitive data in print statement

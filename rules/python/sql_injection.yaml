@@ -1,0 +1,21 @@
+id: PY_SQL_INJECTION
+name: SQL Injection
+description: Detects string concatenation in SQL queries in Python
+severity: SEVERE
+category: security
+languages:
+  - python
+suggestion: Use parameterized queries instead of string formatting
+patterns:
+  - type: regex
+    pattern: '(?i)(execute|executemany|cursor\.execute)\s*\([^)]*\+[^)]*\)'
+    comment: String concatenation in SQL query
+  - type: regex
+    pattern: '(?i)(execute|executemany|cursor\.execute)\s*%\s*\('
+    comment: String formatting in SQL query
+  - type: regex
+    pattern: '(?i)(execute|executemany|cursor\.execute)\s*\.format\('
+    comment: String .format() in SQL query
+  - type: regex
+    pattern: '(?i)f["\x27].*SELECT.*\{'
+    comment: f-string in SQL query

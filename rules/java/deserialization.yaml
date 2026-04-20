@@ -1,0 +1,18 @@
+id: JAVA_DESERIALIZATION
+name: Insecure Deserialization
+description: Detects potentially unsafe deserialization in Java
+severity: SEVERE
+category: security
+languages:
+  - java
+suggestion: Use secure serialization or validate input thoroughly
+patterns:
+  - type: regex
+    pattern: '(?i)ObjectInputStream\s*\('
+    comment: Unsafe Java deserialization
+  - type: regex
+    pattern: '(?i)readObject\s*\('
+    comment: Unsafe deserialization call
+  - type: regex
+    pattern: '(?i)XMLDecoder\s*\('
+    comment: Unsafe XML decoding
