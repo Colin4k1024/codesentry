@@ -17,14 +17,14 @@ Thank you for your interest in contributing!
 
 ```bash
 # Clone the repository
-git clone https://github.com/Colin4k1024/codesentry_refactor.git
-cd codesentry_refactor
+git clone https://github.com/Colin4k1024/codesentry.git
+cd codesentry
 
 # Install dependencies
 go mod download
 
 # Build
-go build -o codesentry ./cmd/goreview
+go build -o goreview ./cmd/goreview
 
 # Run all tests
 go test ./...
@@ -106,9 +106,9 @@ Create a `rules/<language>/` directory with YAML rule files. See [docs/RULES.md]
 ### 4. Test Your Parser
 
 ```bash
-go build -o codesentry ./cmd/goreview
-./codesentry languages      # Should list your new language
-./codesentry scan ./testdir # Test on a sample file
+go build -o goreview ./cmd/goreview
+./goreview languages      # Should list your new language
+./goreview scan ./testdir # Test on a sample file
 ```
 
 ---
@@ -202,7 +202,7 @@ password = "hardcoded_secret_123"
 2. Run the scanner:
 
 ```bash
-./codesentry scan /tmp/test_rule.py --security
+./goreview scan /tmp/test_rule.py --security
 ```
 
 3. Verify your rule triggers on the test file.
@@ -327,10 +327,10 @@ abcoder Bridge (internal/abcoder/bridge.go)
 
 ```bash
 # Skip AI context enrichment (faster scanning)
-./codesentry scan ./src --no-ai
+./goreview scan ./src --no-ai
 
 # With AI context (default for Go files)
-./codesentry scan ./src --security
+./goreview scan ./src --security
 ```
 
 ---

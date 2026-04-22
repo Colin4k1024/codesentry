@@ -255,7 +255,7 @@ type Result struct {
 ## Data Flow
 
 ```
-User runs: ./codesentry scan ./src --security
+User runs: ./goreview scan ./src --security
           │
           ▼
 RootCmd.Execute() → scanCmd.Run()

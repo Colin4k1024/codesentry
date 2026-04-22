@@ -40,14 +40,14 @@ A fast, extensible static analysis and AI-powered code review tool with support 
 go install github.com/Colin4k1024/codesentry/cmd/goreview@latest
 ```
 
-This installs the `codesentry` binary to your `$GOPATH/bin` directory. Make sure `$GOPATH/bin` is in your `$PATH`.
+This installs the `goreview` binary to your `$GOPATH/bin` directory. Make sure `$GOPATH/bin` is in your `$PATH`.
 
 ### From Source
 
 ```bash
 git clone https://github.com/Colin4k1024/codesentry.git
 cd codesentry
-go build -o codesentry ./cmd/goreview
+go build -o goreview ./cmd/goreview
 ```
 
 ### Pre-built Binary
@@ -58,28 +58,28 @@ Download from the [Releases](https://github.com/Colin4k1024/codesentry/releases)
 
 ```bash
 # Scan a directory for security issues
-./codesentry scan ./src --security
+goreview scan ./src --security
 
 # Scan with all rules (default)
-./codesentry scan ./src
+goreview scan ./src
 
 # Scan with performance rules only
-./codesentry scan ./src --performance
+goreview scan ./src --performance
 
 # Disable AI-powered suggestions (faster, no context enrichment)
-./codesentry scan ./src --security --no-ai
+goreview scan ./src --security --no-ai
 
 # Output to JSON file
-./codesentry scan ./src --security -o results.json
+goreview scan ./src --security -o results.json
 
 # Output in SARIF format (CI/CD integration)
-./codesentry scan ./src --security -o results.sarif
+goreview scan ./src --security -o results.sarif
 
 # List supported languages
-./codesentry languages
+goreview languages
 
 # Show version
-./codesentry version
+goreview version
 ```
 
 ## Security Rules
@@ -220,17 +220,17 @@ codesentry/
 ```yaml
 - name: Run CodeSentry
   run: |
-    curl -sL https://github.com/Colin4k1024/codesentry/releases/latest/download/codesentry_linux_amd64 -o codesentry
-    chmod +x codesentry
-    ./codesentry scan ./src --security -o codesentry-results.json
+    curl -sL https://github.com/Colin4k1024/codesentry/releases/latest/download/goreview_darwin_amd64.tar.gz -o goreview.tar.gz
+    tar -xzf goreview.tar.gz
+    ./goreview scan ./src --security -o codesentry-results.json
 ```
 
 ### GitLab CI
 
 ```yaml
-codesentry:
+goreview:
   script:
-    - ./codesentry scan ./src --security -o codesentry-results.sarif
+    - ./goreview scan ./src --security -o codesentry-results.sarif
   artifacts:
     reports:
       sast: codesentry-results.sarif

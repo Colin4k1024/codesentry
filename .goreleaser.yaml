@@ -6,9 +6,9 @@ version: 2
 project_name: codesentry
 
 builds:
-  - id: codesentry-darwin
+  - id: goreview-darwin
     main: ./cmd/goreview
-    binary: codesentry
+    binary: goreview
     goos:
       - darwin
     goarch:
