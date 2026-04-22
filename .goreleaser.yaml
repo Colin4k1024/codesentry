@@ -1,0 +1,36 @@
+# .goreleaser.yaml for CodeSentry
+# https://goreleaser.com
+
+version: 2
+
+project_name: codesentry
+
+builds:
+  - id: codesentry-darwin
+    main: ./cmd/goreview
+    binary: codesentry
+    goos:
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+    env:
+      - CGO_ENABLED=1
+
+checksum:
+  algorithm: sha256
+
+release:
+  github:
+    owner: Colin4k1024
+    name: codesentry
+  draft: false
+  prerelease: auto
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+      - '^chore:'

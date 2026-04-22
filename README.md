@@ -34,17 +34,25 @@ A fast, extensible static analysis and AI-powered code review tool with support 
 
 ## Installation
 
+### Using go install (Recommended)
+
+```bash
+go install github.com/Colin4k1024/codesentry/cmd/goreview@latest
+```
+
+This installs the `codesentry` binary to your `$GOPATH/bin` directory. Make sure `$GOPATH/bin` is in your `$PATH`.
+
 ### From Source
 
 ```bash
-git clone https://github.com/Colin4k1024/codesentry_refactor.git
-cd codesentry_refactor
+git clone https://github.com/Colin4k1024/codesentry.git
+cd codesentry
 go build -o codesentry ./cmd/goreview
 ```
 
 ### Pre-built Binary
 
-Download from the [Releases](https://github.com/Colin4k1024/codesentry_refactor/releases) page.
+Download from the [Releases](https://github.com/Colin4k1024/codesentry/releases) page.
 
 ## Quick Start
 
@@ -212,7 +220,7 @@ codesentry/
 ```yaml
 - name: Run CodeSentry
   run: |
-    curl -sL https://github.com/Colin4k1024/codesentry_refactor/releases/latest/download/codesentry_linux_amd64 -o codesentry
+    curl -sL https://github.com/Colin4k1024/codesentry/releases/latest/download/codesentry_linux_amd64 -o codesentry
     chmod +x codesentry
     ./codesentry scan ./src --security -o codesentry-results.json
 ```
