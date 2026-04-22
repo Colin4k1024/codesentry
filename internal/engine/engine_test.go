@@ -453,3 +453,146 @@ func TestEngine_Scan_ReadError(t *testing.T) {
 	// Should handle read error gracefully
 	_ = result
 }
+
+func TestEngine_Scan_NoRules(t *testing.T) {
+	tmpDir := t.TempDir()
+
+	goFile := filepath.Join(tmpDir, "test.go")
+	if err := os.WriteFile(goFile, []byte(`password = "secret"`), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	// Create engine with no rules
+	e := New([]rules.Rule{})
+	cfg := &Config{}
+	result, err := e.Scan([]string{tmpDir}, cfg)
+	if err != nil {
+		t.Fatalf("Scan() returned error: %v", err)
+	}
+
+	// Should scan file but find no issues
+	if result.FilesScanned != 1 {
+		t.Errorf("FilesScanned = %d, want 1", result.FilesScanned)
+	}
+	if result.TotalIssues != 0 {
+		t.Errorf("TotalIssues = %d, want 0", result.TotalIssues)
+	}
+}
+
+func TestEngine_Scan_NoMatchingRule(t *testing.T) {
+	tmpDir := t.TempDir()
+
+	goFile := filepath.Join(tmpDir, "test.go")
+	if err := os.WriteFile(goFile, []byte(`password = "secret"`), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	// Create rule for Python only
+	e := New([]rules.Rule{
+		{
+			ID:       "HARDCODED_SECRET",
+			Name:     "Hardcoded Secret",
+			Severity: "SEVERE",
+			Category: "security",
+			Languages: []string{"python"}, // Go file should not match
+			Patterns: []rules.Pattern{
+				{Type: "regex", Pattern: "(?i)password", Comment: "hardcoded secret"},
+			},
+		},
+	})
+	cfg := &Config{}
+	result, err := e.Scan([]string{tmpDir}, cfg)
+	if err != nil {
+		t.Fatalf("Scan() returned error: %v", err)
+	}
+
+	// Should not find issues (rule is for Python, not Go)
+	if result.TotalIssues != 0 {
+		t.Errorf("TotalIssues = %d, want 0 (no matching language)", result.TotalIssues)
+	}
+}
+
+func TestEngine_Scan_EmptySeverity(t *testing.T) {
+	tmpDir := t.TempDir()
+
+	goFile := filepath.Join(tmpDir, "test.go")
+	if err := os.WriteFile(goFile, []byte(`password = "secret"`), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	// Create rule without severity
+	e := New([]rules.Rule{
+		{
+			ID:       "HARDCODED_SECRET",
+			Name:     "Hardcoded Secret",
+			// Severity is empty - should default to WARNING
+			Category: "security",
+			Languages: []string{"go"},
+			Patterns: []rules.Pattern{
+				{Type: "regex", Pattern: "(?i)password", Comment: "hardcoded secret"},
+			},
+		},
+	})
+	cfg := &Config{}
+	result, err := e.Scan([]string{tmpDir}, cfg)
+	if err != nil {
+		t.Fatalf("Scan() returned error: %v", err)
+	}
+
+	// Severity should default to WARNING
+	if result.Warning != 1 {
+		t.Errorf("Warning = %d, want 1 (severity should default to WARNING)", result.Warning)
+	}
+}
+
+func TestIsCodeFile(t *testing.T) {
+	tests := []struct {
+		ext    string
+		isCode bool
+	}{
+		{".go", true},
+		{".js", true},
+		{".py", true},
+		{".java", true},
+		{".rb", true},
+		{".rs", true},
+		{".cpp", true},
+		{".c", true},
+		{".h", true},
+		{".php", true},
+		{".swift", true},
+		{".kt", true},
+		{".ts", true},
+		{".tsx", true},
+		{".txt", false},
+		{".md", false},
+		{".json", false},
+		{".xml", false},
+		{".yaml", false},
+		{".yml", false},
+		{"", false},
+	}
+
+	for _, tt := range tests {
+		result := isCodeFile(tt.ext)
+		if result != tt.isCode {
+			t.Errorf("isCodeFile(%q) = %v, want %v", tt.ext, result, tt.isCode)
+		}
+	}
+}
+
+func TestEngine_New(t *testing.T) {
+	rules := []rules.Rule{
+		{
+			ID:   "TEST_RULE",
+			Name: "Test Rule",
+		},
+	}
+	e := New(rules)
+	if e == nil {
+		t.Fatal("New() returned nil")
+	}
+	if len(e.rules) != 1 {
+		t.Errorf("len(e.rules) = %d, want 1", len(e.rules))
+	}
+}

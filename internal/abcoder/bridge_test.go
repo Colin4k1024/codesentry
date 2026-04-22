@@ -80,3 +80,91 @@ func TestBridgeGetContextNotParsed(t *testing.T) {
 		t.Error("GetContext without Parse should return error")
 	}
 }
+
+func TestBridgeGetFunction(t *testing.T) {
+	bridge, err := NewBridge(".")
+	if err != nil {
+		t.Fatalf("NewBridge failed: %v", err)
+	}
+
+	ctx := context.Background()
+	if err := bridge.Parse(ctx); err != nil {
+		t.Fatalf("Parse failed: %v", err)
+	}
+
+	// GetFunction with non-existent identity should fail
+	_, err = bridge.GetFunction("nonexistent")
+	if err == nil {
+		t.Error("GetFunction with non-existent identity should return error")
+	}
+}
+
+func TestBridgeGetVariable(t *testing.T) {
+	bridge, err := NewBridge(".")
+	if err != nil {
+		t.Fatalf("NewBridge failed: %v", err)
+	}
+
+	ctx := context.Background()
+	if err := bridge.Parse(ctx); err != nil {
+		t.Fatalf("Parse failed: %v", err)
+	}
+
+	// GetVariable with non-existent identity should fail
+	_, err = bridge.GetVariable("nonexistent")
+	if err == nil {
+		t.Error("GetVariable with non-existent identity should return error")
+	}
+}
+
+func TestBridgeGetCallChain(t *testing.T) {
+	bridge, err := NewBridge(".")
+	if err != nil {
+		t.Fatalf("NewBridge failed: %v", err)
+	}
+
+	ctx := context.Background()
+	if err := bridge.Parse(ctx); err != nil {
+		t.Fatalf("Parse failed: %v", err)
+	}
+
+	// GetCallChain with non-existent identity should fail
+	_, err = bridge.GetCallChain("nonexistent")
+	if err == nil {
+		t.Error("GetCallChain with non-existent identity should return error")
+	}
+}
+
+func TestParseIdentity(t *testing.T) {
+	// Test parseIdentity with different formats
+	tests := []struct {
+		nodeID string
+		// Just test that it doesn't panic
+	}{
+		{"Name"},
+		{"PkgPath#Name"},
+		{"ModPath?PkgPath#Name"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.nodeID, func(t *testing.T) {
+			identity := parseIdentity(tt.nodeID)
+			if identity.Name == "" && tt.nodeID != "" {
+				t.Error("parseIdentity returned empty name")
+			}
+		})
+	}
+}
+
+func TestGetTypeName(t *testing.T) {
+	bridge, err := NewBridge(".")
+	if err != nil {
+		t.Fatalf("NewBridge failed: %v", err)
+	}
+
+	// Test getTypeName with nil
+	result := bridge.getTypeName(nil)
+	if result != "" {
+		t.Errorf("getTypeName(nil) = %q, want empty string", result)
+	}
+}
