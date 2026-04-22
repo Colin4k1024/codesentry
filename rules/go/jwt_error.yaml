@@ -1,0 +1,11 @@
+id: JWT_ERROR
+name: JWT Verification Bypass
+description: Detects JWT parsed with nil key function, bypassing signature verification
+severity: SEVERE
+category: security
+languages: [go]
+suggestion: Always provide a valid key function for JWT parsing to verify signatures
+patterns:
+  - type: ast
+    language: go
+    query: 'jwt.Parse with nil key function'

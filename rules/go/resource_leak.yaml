@@ -1,0 +1,11 @@
+id: RESOURCE_LEAK
+name: Resource Leak
+description: Detects resources (database connections, file handles) opened but not properly closed
+severity: WARNING
+category: performance
+languages: [go]
+suggestion: Ensure resources are closed in defer statements or using proper lifecycle management
+patterns:
+  - type: ast
+    language: go
+    query: 'sql.Open without corresponding Close'

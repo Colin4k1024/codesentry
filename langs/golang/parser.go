@@ -56,17 +56,17 @@ func (p *GoParser) checkAST(filePath string, content string, langRules []rules.R
 	}
 
 	hasGoroutineLeakRule := false
-	hasContextLeakRule := false
 	hasResourceLeakRule := false
+	hasJWTErrorRule := false
 	for _, r := range langRules {
 		if r.ID == "GOROUTINE_LEAK" {
 			hasGoroutineLeakRule = true
 		}
-		if r.ID == "CONTEXT_LEAK" {
-			hasContextLeakRule = true
-		}
 		if r.ID == "RESOURCE_LEAK" {
 			hasResourceLeakRule = true
+		}
+		if r.ID == "JWT_ERROR" {
+			hasJWTErrorRule = true
 		}
 	}
 
@@ -142,7 +142,7 @@ func (p *GoParser) checkAST(filePath string, content string, langRules []rules.R
 		}
 	}
 
-	if hasContextLeakRule && usesJWT {
+	if hasJWTErrorRule && usesJWT {
 		ast.Inspect(file, func(n ast.Node) bool {
 			if call, ok := n.(*ast.CallExpr); ok {
 				if sel, ok := call.Fun.(*ast.SelectorExpr); ok && sel.Sel.Name == "Parse" {

@@ -135,9 +135,35 @@ func query() {
 		t.Fatal(err)
 	}
 
-	// Note: RESOURCE_LEAK rule doesn't exist yet in rules/go/
-	// This test documents expected behavior once the rule is added
-	t.Skip("RESOURCE_LEAK rule does not exist in rules/go/ - test skipped")
+	content, err := os.ReadFile(testFile)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Load rules
+	rulesDir := filepath.Join("..", "..", "rules")
+	allRules := rules.LoadRules(rulesDir)
+	var goRules []rules.Rule
+	for _, r := range allRules {
+		if r.ID == "RESOURCE_LEAK" {
+			goRules = append(goRules, r)
+		}
+	}
+
+	if len(goRules) == 0 {
+		t.Fatal("RESOURCE_LEAK rule not found")
+	}
+
+	parser := &GoParser{}
+	findings, err := parser.Parse(testFile, content, goRules)
+	if err != nil {
+		t.Fatalf("Parse returned error: %v", err)
+	}
+
+	// Should find at least 1 resource leak
+	if len(findings) == 0 {
+		t.Error("expected to find resource leak, found none")
+	}
 }
 
 func TestGoParser_Extensions(t *testing.T) {
