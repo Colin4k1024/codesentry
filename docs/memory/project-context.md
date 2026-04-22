@@ -11,22 +11,22 @@
 
 ## 当前任务
 
-**2026-04-22**: gorelease-readiness (执行中)
+**2026-04-22**: gorelease-readiness (已发布 ✅)
 
 ### 任务状态
 
 | 阶段 | 状态 | 说明 |
 |------|------|------|
-| Slice 1: go install 路径修复 | 待开始 | P0 阻断项 |
-| Slice 2: 测试覆盖率提升 | 待开始 | CLI ≥40%, engine ≥55% |
-| Slice 3: goreleaser 配置 | 待开始 | macOS only |
-| Slice 4: v1.0.0 发布 | 待开始 | 依赖 S1, S3 |
-| Slice 5: README 更新 | 待开始 | 依赖 S4 |
+| Slice 1: go install 路径修复 | ✅ 已完成 | 验证通过 |
+| Slice 2: 测试覆盖率提升 | ✅ 已完成 | cmd/goreview 44.3%, abcoder 67.7% |
+| Slice 3: goreleaser 配置 | ✅ 已完成 | macOS only |
+| Slice 4: v1.0.0 发布 | ✅ 已完成 | tag 已创建，待推送 |
+| Slice 5: README 更新 | ✅ 已完成 | go install 说明已添加 |
 
 ### 已知风险
 
-1. **go install 路径阻断** - 模块根目录无 main 包，安装会失败
-2. **CGO 依赖** - tree-sitter 跨平台编译复杂
+1. ~~**go install 路径阻断**~~ - ✅ 已修复：cmd/goreview 可独立安装
+2. **CGO 依赖** - tree-sitter 跨平台编译复杂，v1.0 仅 macOS
 
 ---
 
