@@ -1,0 +1,26 @@
+# Binary
+codesentry
+codesentry.exe
+
+# macOS
+.DS_Store
+
+# Go
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+coverage.out
+coverage.html
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Test
+testdata/rules/*.golden.json

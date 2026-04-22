@@ -1,0 +1,21 @@
+id: PY_SUBPROCESS
+name: Subprocess Shell Injection
+description: Detects subprocess calls with shell=True or string concatenation
+severity: SEVERE
+category: security
+languages:
+  - python
+suggestion: Use shell=False and pass arguments as a list
+patterns:
+  - type: regex
+    pattern: 'subprocess\.run.*shell\s*=\s*True'
+    comment: Shell injection risk with shell=True
+  - type: regex
+    pattern: 'subprocess\.call.*shell\s*=\s*True'
+    comment: Shell injection risk with shell=True
+  - type: regex
+    pattern: 'os\.system\s*\('
+    comment: Shell injection risk with os.system()
+  - type: regex
+    pattern: 'os\.popen\s*\('
+    comment: Shell injection risk with os.popen()

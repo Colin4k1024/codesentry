@@ -1,0 +1,14 @@
+id: PATH_TRAVERSAL
+name: Path Traversal
+description: Detects file path operations that could allow path traversal attacks
+severity: SEVERE
+category: security
+languages: [go]
+suggestion: Validate and sanitize file paths, use filepath.Clean and filepath.Base
+patterns:
+  - type: regex
+    pattern: 'ioutil\.(ReadFile|WriteFile).*\+'
+    comment: Potential path traversal via string concatenation
+  - type: regex
+    pattern: 'os\.Open.*\+|os\.Create.*\+'
+    comment: Potential path traversal via string concatenation

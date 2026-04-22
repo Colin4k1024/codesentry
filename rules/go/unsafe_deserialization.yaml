@@ -1,0 +1,14 @@
+id: UNSAFE_DESERIALIZATION
+name: Unsafe Deserialization
+description: Detects use of encoding.BinaryUnmarshaler or reflection-based unmarshaling
+severity: SEVERE
+category: security
+languages: [go]
+suggestion: Use safe alternatives like encoding/json or ensure input is trusted
+patterns:
+  - type: regex
+    pattern: 'gob\.Unmarshal.*\(.*\[\]byte'
+    comment: Unsafe deserialization with gob
+  - type: regex
+    pattern: 'xml\.Unmarshal.*\[\]byte'
+    comment: Potential XXE or unsafe XML unmarshaling

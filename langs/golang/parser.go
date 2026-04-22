@@ -4,7 +4,6 @@ import (
 	"go/ast"
 	"go/parser"
 	"go/token"
-	"regexp"
 	"strings"
 
 	parserpkg "github.com/Colin4k1024/codesentry/internal/parser"
@@ -15,7 +14,9 @@ func init() {
 	parserpkg.Register(&GoParser{})
 }
 
-type GoParser struct{}
+type GoParser struct {
+	parserpkg.BaseRegexParser
+}
 
 func (p *GoParser) Language() string { return "go" }
 
@@ -23,35 +24,13 @@ func (p *GoParser) Extensions() []string { return []string{".go"} }
 
 func (p *GoParser) Parse(filePath string, content []byte, langRules []rules.Rule) ([]parserpkg.Finding, error) {
 	var findings []parserpkg.Finding
-	text := string(content)
-	lines := strings.Split(text, "\n")
 
-	for _, rule := range langRules {
-		for _, pattern := range rule.Patterns {
-			if pattern.Type != "regex" {
-				continue
-			}
-			re, err := regexp.Compile(pattern.Pattern)
-			if err != nil {
-				continue
-			}
-			for lineNum, line := range lines {
-				if re.MatchString(line) {
-					findings = append(findings, parserpkg.Finding{
-						RuleID:   rule.ID,
-						Line:     lineNum + 1,
-						Column:   1,
-						EndLine:  lineNum + 1,
-						Severity: rule.Severity,
-						Message:  pattern.Comment,
-					})
-				}
-			}
-		}
-	}
+	// Parse regex-based rules using BaseRegexParser
+	regexFindings := p.BaseRegexParser.ParseRegex(content, langRules)
+	findings = append(findings, regexFindings...)
 
-	// Also do AST-based checks for Go-specific patterns that regex can't catch
-	astFindings := p.checkAST(filePath, text, langRules)
+	// Also do AST-based checks for Go-specific patterns
+	astFindings := p.checkAST(filePath, string(content), langRules)
 	findings = append(findings, astFindings...)
 
 	return findings, nil
@@ -150,12 +129,12 @@ func (p *GoParser) checkAST(filePath string, content string, langRules []rules.R
 	if hasResourceLeakRule {
 		for name, pos := range openedResources {
 			if !closedResources[name] {
-				p := fset.Position(pos)
+				pos2 := fset.Position(pos)
 				findings = append(findings, parserpkg.Finding{
 					RuleID:   "RESOURCE_LEAK",
-					Line:     p.Line,
-					Column:   p.Column,
-					EndLine:  p.Line,
+					Line:     pos2.Line,
+					Column:   pos2.Column,
+					EndLine:  pos2.Line,
 					Severity: "WARNING",
 					Message:  "Resource '" + name + "' opened but never closed",
 				})
@@ -189,6 +168,7 @@ func (p *GoParser) checkAST(filePath string, content string, langRules []rules.R
 	return findings
 }
 
+// isNilExpr checks if an expression is a nil literal
 func isNilExpr(n ast.Expr) bool {
 	if ident, ok := n.(*ast.Ident); ok {
 		return ident.Name == "nil"

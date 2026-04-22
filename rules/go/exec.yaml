@@ -1,0 +1,11 @@
+id: EXEC
+name: Command Execution
+description: Detects use of os/exec with user input that could allow command injection
+severity: SEVERE
+category: security
+languages: [go]
+suggestion: Use parameterized execution or validate input thoroughly
+patterns:
+  - type: regex
+    pattern: 'exec\.Command.*\+'
+    comment: Command injection via string concatenation

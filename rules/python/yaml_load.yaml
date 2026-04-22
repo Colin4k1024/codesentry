@@ -1,0 +1,15 @@
+id: PY_YAML_LOAD
+name: YAML Deserialization
+description: Detects use of yaml.load which can execute arbitrary code
+severity: SEVERE
+category: security
+languages:
+  - python
+suggestion: Use yaml.safe_load() instead of yaml.load()
+patterns:
+  - type: regex
+    pattern: 'yaml\.load\s*\('
+    comment: Insecure YAML deserialization - use yaml.safe_load()
+  - type: regex
+    pattern: 'yaml\.(unsafe_load|unsafe_load_all)'
+    comment: Unsafe YAML loading can execute arbitrary code

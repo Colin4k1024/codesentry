@@ -1,0 +1,19 @@
+id: TSPrototype_POLLUTION
+name: Prototype Pollution
+description: Detects object merging or copying that could cause prototype pollution
+severity: SEVERE
+category: security
+languages:
+  - typescript
+  - javascript
+suggestion: Validate and sanitize object keys, avoid insecure merge operations
+patterns:
+  - type: regex
+    pattern: 'Object\.assign\s*\([^,]+,\s*[^)]*\+\s*[^)]*\)'
+    comment: Potential prototype pollution via Object.assign with computed properties
+  - type: regex
+    pattern: 'merge\s*\([^)]*\.\.\.\w+\s*\)'
+    comment: Potential prototype pollution with spread operator in merge
+  - type: regex
+    pattern: 'lodash.*merge.*\.\.\.'
+    comment: lodash merge with spread may cause prototype pollution

@@ -1,0 +1,22 @@
+id: TS_EVAL_WITH_INPUT
+name: Eval with User Input
+description: Detects eval() or Function() calls that use user-provided input
+severity: SEVERE
+category: security
+languages:
+  - typescript
+  - javascript
+suggestion: Never pass user input to eval() or similar functions
+patterns:
+  - type: regex
+    pattern: '(?i)eval\s*\([^)]*\+\s*[^)]*\)'
+    comment: eval with concatenated user input
+  - type: regex
+    pattern: '(?i)new\s+Function\s*\([^)]*\+\s*[^)]*\)'
+    comment: Function constructor with concatenated user input
+  - type: regex
+    pattern: '(?i)setTimeout\s*\([^)]*\+\s*[^)]*,\s*\d+\s*\)'
+    comment: setTimeout with string concatenation
+  - type: regex
+    pattern: '(?i)setInterval\s*\([^)]*\+\s*[^)]*,\s*\d+\s*\)'
+    comment: setInterval with string concatenation
