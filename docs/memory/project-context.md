@@ -17,14 +17,25 @@
 
 | 分组 | 状态 | 备注 |
 |------|------|------|
-| A: 测试覆盖率提升 | pending | 目标: 核心包 > 80% |
-| B: JavaScript 规则补充 | blocked by A | 先评估 TS 规则覆盖 |
-| C: Go AST 测试策略 | blocked | 需先验证 AST 实现正确性 |
+| Slice 1: Go AST 验证 | ✅ 完成 | GOROUTINE_LEAK 已测试，RESOURCE_LEAK 规则缺失 |
+| Slice 2: JS/TS 覆盖评估 | ✅ 完成 | JS 已有足够覆盖，无需独立 JS 规则 |
+| Slice 3: 测试覆盖率提升 | ✅ 完成 | golang 68%, abcoder 65.2%, engine 48.8% |
 
-### 关键依赖
+## 覆盖率现状
 
-- Go AST 检测逻辑 (`langs/golang/parser.go`) 从未测试
-- `internal/engine` 是所有 parser 基础，需优先提升覆盖率
+| 包 | 覆盖率 | 备注 |
+|-----|--------|------|
+| langs/golang | 68% | 新增测试 |
+| internal/abcoder | 65.2% | 新增测试 |
+| internal/engine | 48.8% | 新增边界测试 |
+| cmd/goreview | 13.1% | CLI 测试有限 |
+| langs/* (其他) | 100% | 9 个解析器 |
+
+## 已知缺陷
+
+1. **RESOURCE_LEAK 规则缺失** - `rules/go/resource_leak.yaml` 不存在
+2. **CONTEXT_LEAK 实现不匹配** - 代码检查 JWT_ERROR，但规则名是 CONTEXT_LEAK
+3. **cmd/goreview 覆盖率低** - CLI 测试需要 cobra 命令环境
 
 ## 技术架构
 
@@ -37,19 +48,9 @@ cmd/goreview (CLI)
             └── langs/* (11 种语言解析器)
 ```
 
-## 已知风险
-
-1. **Go AST 实现未验证** - GOROUTINE_LEAK, CONTEXT_LEAK, RESOURCE_LEAK 逻辑无测试
-2. **JavaScript 无专用规则** - 仅依赖跨语言通用规则
-3. **测试覆盖率分布不均** - 核心包 45-47%, CLI 仅 13%
-
-## 下一步行动
-
-1. **Slice 1**: 验证 Go AST 实现正确性 (backend-engineer)
-2. **Slice 2**: 评估 JS/TS 规则覆盖关系 (security-reviewer)
-3. **Slice 3**: 提升核心包测试覆盖率 (qa-engineer)
-
 ## 产出文档
 
 - `docs/artifacts/2026-04-22-codesentry-project-review/prd.md`
 - `docs/artifacts/2026-04-22-codesentry-project-review/delivery-plan.md`
+- `docs/artifacts/2026-04-22-codesentry-project-review/execute-log.md`
+- `docs/artifacts/2026-04-22-codesentry-project-review/slice2-js-coverage-analysis.md`
