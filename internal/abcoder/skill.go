@@ -8,13 +8,13 @@ import (
 
 // SkillInput represents the input for the code-reviewer skill
 type SkillInput struct {
-	Task        string       `json:"task"`
-	Vulnerability string    `json:"vulnerability"`
-	File       string       `json:"file"`
-	Line       int          `json:"line"`
-	RuleID     string       `json:"rule_id"`
-	Suggestion string       `json:"suggestion"`
-	Context    *CodeContext `json:"context,omitempty"`
+	Task          string       `json:"task"`
+	Vulnerability string       `json:"vulnerability"`
+	File          string       `json:"file"`
+	Line          int          `json:"line"`
+	RuleID        string       `json:"rule_id"`
+	Suggestion    string       `json:"suggestion"`
+	Context       *CodeContext `json:"context,omitempty"`
 }
 
 // SkillOutput represents the output from the code-reviewer skill
@@ -23,7 +23,7 @@ type SkillOutput struct {
 	After       string   `json:"after"`
 	Explanation string   `json:"explanation"`
 	Confidence  float64  `json:"confidence"`
-	Warnings   []string `json:"warnings,omitempty"`
+	Warnings    []string `json:"warnings,omitempty"`
 }
 
 // SkillAgent provides integration with Claude Code's code-reviewer skill
@@ -53,7 +53,7 @@ func (s *SkillAgent) GenerateFix(ctx context.Context, ruleID, suggestion, file s
 
 	// Build skill input
 	input := SkillInput{
-		Task:         "generate_fix",
+		Task:          "generate_fix",
 		Vulnerability: ruleID,
 		File:          file,
 		Line:          line,

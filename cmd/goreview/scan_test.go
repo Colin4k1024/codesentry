@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
 	"os"
 	"path/filepath"
 	"strings"
@@ -11,72 +12,77 @@ import (
 	"github.com/Colin4k1024/codesentry/internal/types"
 )
 
-func TestOutputResultsFormat(t *testing.T) {
-	result := &types.Result{
+func sampleScanResult() *types.Result {
+	return &types.Result{
 		FilesScanned: 5,
-		TotalIssues:   3,
+		TotalIssues:  1,
 		Severe:       1,
-		Warning:      2,
+		Warning:      0,
 		Info:         0,
 		Duration:     100 * time.Millisecond,
 		Issues: []types.Issue{
 			{
-				RuleID:    "TEST001",
-				Title:     "Hardcoded Secret",
-				Severity:  "SEVERE",
-				File:      "config.go",
-				Line:      10,
-				Column:    5,
-				Message:   "Possible hardcoded secret detected",
+				RuleID:     "TEST001",
+				Title:      "Hardcoded Secret",
+				Severity:   "SEVERE",
+				File:       "config.go",
+				Line:       10,
+				Column:     5,
+				Message:    "Possible hardcoded secret detected",
 				Suggestion: "Use environment variables instead",
-			},
-			{
-				RuleID:    "TEST002",
-				Title:     "SQL Injection Risk",
-				Severity:  "WARNING",
-				File:      "db.go",
-				Line:      25,
-				Column:    3,
-				Message:   "Potential SQL injection vulnerability",
-				Suggestion: "Use parameterized queries",
 			},
 		},
 	}
+}
 
-	var buf bytes.Buffer
+func withOutputFlag(t *testing.T, value string) {
+	t.Helper()
+	old := outputFlag
+	outputFlag = value
+	t.Cleanup(func() {
+		outputFlag = old
+	})
+}
+
+func captureStdout(t *testing.T, fn func() error) string {
+	t.Helper()
+
 	oldStdout := os.Stdout
-	r, w, _ := os.Pipe()
+	r, w, err := os.Pipe()
+	if err != nil {
+		t.Fatalf("failed to create stdout pipe: %v", err)
+	}
 	os.Stdout = w
 
-	outputResults(result)
+	fnErr := fn()
 
-	w.Close()
+	if err := w.Close(); err != nil {
+		t.Fatalf("failed to close stdout writer: %v", err)
+	}
 	os.Stdout = oldStdout
+	if fnErr != nil {
+		t.Fatalf("function returned error: %v", fnErr)
+	}
 
-	_, _ = buf.ReadFrom(r)
-	output := buf.String()
+	var buf bytes.Buffer
+	if _, err := buf.ReadFrom(r); err != nil {
+		t.Fatalf("failed to read stdout: %v", err)
+	}
+	return buf.String()
+}
 
-	// Verify output contains expected sections
+func TestWriteScanOutputStdoutText(t *testing.T) {
+	withOutputFlag(t, "")
+
+	output := captureStdout(t, func() error {
+		return writeScanOutput(sampleScanResult())
+	})
+
 	if !strings.Contains(output, "CodeSentry Scan Results") {
 		t.Error("missing scan results header")
 	}
 	if !strings.Contains(output, "Files scanned: 5") {
 		t.Error("missing files scanned count")
-	}
-	if !strings.Contains(output, "Total issues: 3") {
-		t.Error("missing total issues count")
-	}
-	if !strings.Contains(output, "SEVERE:   1") {
-		t.Error("missing severe count")
-	}
-	if !strings.Contains(output, "WARNING:  2") {
-		t.Error("missing warning count")
-	}
-	if !strings.Contains(output, "Issues Found") {
-		t.Error("missing issues section")
-	}
-	if !strings.Contains(output, "Hardcoded Secret") {
-		t.Error("missing issue title")
 	}
 	if !strings.Contains(output, "config.go:10:5") {
 		t.Error("missing file location")
@@ -86,41 +92,71 @@ func TestOutputResultsFormat(t *testing.T) {
 	}
 }
 
-func TestOutputResultsEmpty(t *testing.T) {
-	result := &types.Result{
-		FilesScanned: 10,
-		TotalIssues:   0,
-		Severe:        0,
-		Warning:       0,
-		Info:          0,
-		Duration:      50 * time.Millisecond,
-		Issues:        []types.Issue{},
+func TestWriteScanOutputJSONFile(t *testing.T) {
+	outputPath := filepath.Join(t.TempDir(), "report.json")
+	withOutputFlag(t, outputPath)
+
+	if err := writeScanOutput(sampleScanResult()); err != nil {
+		t.Fatalf("writeScanOutput returned error: %v", err)
 	}
 
-	var buf bytes.Buffer
-	oldStdout := os.Stdout
-	r, w, _ := os.Pipe()
-	os.Stdout = w
-
-	outputResults(result)
-
-	w.Close()
-	os.Stdout = oldStdout
-
-	_, _ = buf.ReadFrom(r)
-	output := buf.String()
-
-	// Should still show header but not "Issues Found"
-	if !strings.Contains(output, "CodeSentry Scan Results") {
-		t.Error("missing scan results header")
+	data, err := os.ReadFile(outputPath)
+	if err != nil {
+		t.Fatalf("failed to read JSON output: %v", err)
 	}
-	if strings.Contains(output, "Issues Found") {
-		t.Error("should not show issues section when no issues")
+
+	var result types.Result
+	if err := json.Unmarshal(data, &result); err != nil {
+		t.Fatalf("output is not valid JSON: %v", err)
+	}
+	if result.TotalIssues != 1 {
+		t.Errorf("TotalIssues = %d, want 1", result.TotalIssues)
+	}
+}
+
+func TestWriteScanOutputSARIFFile(t *testing.T) {
+	outputPath := filepath.Join(t.TempDir(), "report.sarif")
+	withOutputFlag(t, outputPath)
+
+	if err := writeScanOutput(sampleScanResult()); err != nil {
+		t.Fatalf("writeScanOutput returned error: %v", err)
+	}
+
+	data, err := os.ReadFile(outputPath)
+	if err != nil {
+		t.Fatalf("failed to read SARIF output: %v", err)
+	}
+
+	var sarif map[string]interface{}
+	if err := json.Unmarshal(data, &sarif); err != nil {
+		t.Fatalf("output is not valid SARIF JSON: %v", err)
+	}
+	if sarif["version"] != "2.1.0" {
+		t.Errorf("SARIF version = %v, want 2.1.0", sarif["version"])
+	}
+	if _, ok := sarif["runs"].([]interface{}); !ok {
+		t.Error("SARIF output missing runs array")
+	}
+}
+
+func TestWriteScanOutputUnknownExtensionFallsBackToText(t *testing.T) {
+	outputPath := filepath.Join(t.TempDir(), "report.out")
+	withOutputFlag(t, outputPath)
+
+	if err := writeScanOutput(sampleScanResult()); err != nil {
+		t.Fatalf("writeScanOutput returned error: %v", err)
+	}
+
+	data, err := os.ReadFile(outputPath)
+	if err != nil {
+		t.Fatalf("failed to read text output: %v", err)
+	}
+	if !strings.Contains(string(data), "CodeSentry Scan Results") {
+		t.Error("unknown extension should write text output")
 	}
 }
 
 func TestScanCommandFlags(t *testing.T) {
-	// Test that all flags are properly initialized
 	if scanCmd.Flags().Lookup("security") == nil {
 		t.Error("security flag not found")
 	}
@@ -139,31 +175,28 @@ func TestScanCommandFlags(t *testing.T) {
 }
 
 func TestScanCmdArgs(t *testing.T) {
-	// Test argument validation
-	if scanCmd.Args != nil {
-		// Should accept minimum 0 args (defaults to ".")
-		err := scanCmd.Args(nil, []string{})
-		if err != nil {
-			t.Errorf("expected no error for empty args, got: %v", err)
-		}
+	if scanCmd.Args == nil {
+		t.Fatal("scan command should define argument validation")
+	}
+	if err := scanCmd.Args(nil, []string{}); err != nil {
+		t.Errorf("expected no error for empty args, got: %v", err)
 	}
 }
 
 func TestScanFlagDefaults(t *testing.T) {
-	// Reset flags to default values
 	securityFlag = false
 	performanceFlag = false
 	noAIFlag = false
 	outputFlag = ""
 	excludeFlag = []string{}
 
-	if securityFlag != false {
+	if securityFlag {
 		t.Error("securityFlag should default to false")
 	}
-	if performanceFlag != false {
+	if performanceFlag {
 		t.Error("performanceFlag should default to false")
 	}
-	if noAIFlag != false {
+	if noAIFlag {
 		t.Error("noAIFlag should default to false")
 	}
 	if outputFlag != "" {
@@ -171,75 +204,5 @@ func TestScanFlagDefaults(t *testing.T) {
 	}
 	if len(excludeFlag) != 0 {
 		t.Error("excludeFlag should default to empty slice")
-	}
-}
-
-func TestOutputResultsEmptySeverity(t *testing.T) {
-	result := &types.Result{
-		FilesScanned: 1,
-		TotalIssues:   1,
-		Severe:       0,
-		Warning:      0,
-		Info:         1,
-		Duration:     10 * time.Millisecond,
-		Issues: []types.Issue{
-			{
-				RuleID:    "TEST003",
-				Title:     "Info Message",
-				Severity:  "", // Empty severity
-				File:      "info.go",
-				Line:      1,
-				Column:    1,
-				Message:   "Informational message",
-			},
-		},
-	}
-
-	var buf bytes.Buffer
-	oldStdout := os.Stdout
-	r, w, _ := os.Pipe()
-	os.Stdout = w
-
-	outputResults(result)
-
-	w.Close()
-	os.Stdout = oldStdout
-
-	_, _ = buf.ReadFrom(r)
-	output := buf.String()
-
-	// Empty severity should default to WARNING
-	if !strings.Contains(output, "[WARNING]") {
-		t.Error("expected empty severity to default to WARNING")
-	}
-}
-
-func TestScanRulesFiltering(t *testing.T) {
-	// Test that rule filtering works correctly
-	tmpDir := t.TempDir()
-
-	// Create test files
-	goFile := filepath.Join(tmpDir, "test.go")
-	goContent := `package main
-
-import "fmt"
-
-func main() {
-	password := "hardcoded"
-	fmt.Println(password)
-}
-`
-	if err := os.WriteFile(goFile, []byte(goContent), 0644); err != nil {
-		t.Fatalf("failed to write test file: %v", err)
-	}
-
-	// The actual scan is tested through the engine
-	// Here we just verify the file was created correctly
-	info, err := os.Stat(goFile)
-	if err != nil {
-		t.Fatalf("failed to stat test file: %v", err)
-	}
-	if info.Size() == 0 {
-		t.Error("test file should not be empty")
 	}
 }

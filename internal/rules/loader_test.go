@@ -74,8 +74,8 @@ func TestFilterByLanguage(t *testing.T) {
 	}
 
 	tests := []struct {
-		lang     string
-		wantIDs  []string
+		lang      string
+		wantIDs   []string
 		wantCount int
 	}{
 		{"go", []string{"A", "C"}, 2},

@@ -1,6 +1,8 @@
 # Binary
-codesentry
-codesentry.exe
+/codesentry
+/codesentry.exe
+/goreview
+/goreview.exe
 
 # macOS
 .DS_Store

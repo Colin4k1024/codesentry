@@ -135,7 +135,7 @@ func (b *Bridge) GetContext(file string, line int) (*CodeContext, error) {
 	for _, fn := range pkg.Functions {
 		if fn.File == file && fn.Line <= line {
 			// Check if line is within function
-			if fn.Line <= line && (fn.Line+strings.Count(fn.Content, "\n")) >= (line - fn.Line) {
+			if fn.Line <= line && (fn.Line+strings.Count(fn.Content, "\n")) >= (line-fn.Line) {
 				ctx.FunctionName = fn.Name
 				ctx.FunctionContent = fn.Content
 

@@ -17,9 +17,9 @@ func TestBaseRegexParser_ParseRegex(t *testing.T) {
 		wantLines []int
 	}{
 		{
-			name:    "no rules",
-			content: "password = \"secret123\"\n",
-			rules:   []rules.Rule{},
+			name:      "no rules",
+			content:   "password = \"secret123\"\n",
+			rules:     []rules.Rule{},
 			wantCount: 0,
 		},
 		{

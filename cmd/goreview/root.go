@@ -10,19 +10,19 @@ import (
 var version = "1.0.0"
 
 var rootCmd = &cobra.Command{
-	Use:   "codesentry",
+	Use:   "goreview",
 	Short: "CodeSentry - AI-powered multi-language code review tool",
 	Long: `CodeSentry is a static analysis and AI-powered code review tool that supports
 multiple programming languages including Go, JavaScript/TypeScript, Python, and more.
 
 Examples:
-  codesentry scan ./...
-  codesentry scan --security --performance
-  codesentry languages
-  codesentry version
+  goreview scan ./...
+  goreview scan --security --performance
+  goreview languages
+  goreview version
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Use 'codesentry --help' for more information")
+		fmt.Println("Use 'goreview --help' for more information")
 	},
 }
 

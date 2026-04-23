@@ -7,10 +7,10 @@ import (
 
 // FixSuggestion represents a suggested fix for a code issue
 type FixSuggestion struct {
-	Before string `json:"before"`
-	After  string `json:"after"`
-	Explanation string `json:"explanation"`
-	Confidence   float64 `json:"confidence"`
+	Before      string  `json:"before"`
+	After       string  `json:"after"`
+	Explanation string  `json:"explanation"`
+	Confidence  float64 `json:"confidence"`
 }
 
 // IssueWithContext represents an issue with additional code context

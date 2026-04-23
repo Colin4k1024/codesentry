@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 	"strings"
 	"text/tabwriter"
 
@@ -19,6 +20,20 @@ const (
 	FormatJSON  Format = "json"
 	FormatSarif Format = "sarif"
 )
+
+const toolVersion = "1.0.0"
+
+// FormatForPath infers the output format from a file path extension.
+func FormatForPath(outputPath string) Format {
+	switch strings.ToLower(filepath.Ext(outputPath)) {
+	case ".json":
+		return FormatJSON
+	case ".sarif":
+		return FormatSarif
+	default:
+		return FormatText
+	}
+}
 
 // Write writes the result in the specified format
 func Write(result *types.Result, format Format, outputPath string) error {
@@ -94,10 +109,10 @@ func formatSarif(result *types.Result) ([]byte, error) {
 			{
 				"tool": map[string]interface{}{
 					"driver": map[string]interface{}{
-						"name":            "CodeSentry",
-						"version":         "0.3.0",
-						"informationUri":  "https://github.com/Colin4k1024/codesentry",
-						"rules":           []map[string]interface{}{},
+						"name":           "CodeSentry",
+						"version":        toolVersion,
+						"informationUri": "https://github.com/Colin4k1024/codesentry",
+						"rules":          []map[string]interface{}{},
 					},
 				},
 				"results": []map[string]interface{}{},

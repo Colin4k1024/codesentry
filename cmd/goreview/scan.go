@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/Colin4k1024/codesentry/internal/engine"
+	"github.com/Colin4k1024/codesentry/internal/output"
 	"github.com/Colin4k1024/codesentry/internal/rules"
 	"github.com/Colin4k1024/codesentry/internal/types"
 	"github.com/spf13/cobra"
@@ -69,35 +70,15 @@ var scanCmd = &cobra.Command{
 		result.Duration = time.Since(start)
 
 		// Output results
-		outputResults(result)
+		if err := writeScanOutput(result); err != nil {
+			fmt.Fprintf(os.Stderr, "Error writing scan output: %v\n", err)
+			os.Exit(1)
+		}
 	},
 }
 
-func outputResults(result *types.Result) {
-	fmt.Printf("\n=== CodeSentry Scan Results ===\n")
-	fmt.Printf("Files scanned: %d\n", result.FilesScanned)
-	fmt.Printf("Total issues: %d\n", result.TotalIssues)
-	fmt.Printf("  SEVERE:   %d\n", result.Severe)
-	fmt.Printf("  WARNING:  %d\n", result.Warning)
-	fmt.Printf("  INFO:     %d\n", result.Info)
-	fmt.Printf("Duration: %v\n", result.Duration)
-
-	if len(result.Issues) > 0 {
-		fmt.Printf("\n=== Issues Found ===\n")
-		for _, issue := range result.Issues {
-			severity := issue.Severity
-			if severity == "" {
-				severity = "WARNING"
-			}
-			fmt.Printf("[%s] %s\n", severity, issue.Title)
-			fmt.Printf("  File: %s:%d:%d\n", issue.File, issue.Line, issue.Column)
-			fmt.Printf("  %s\n", issue.Message)
-			if issue.Suggestion != "" {
-				fmt.Printf("  Suggestion: %s\n", issue.Suggestion)
-			}
-			fmt.Println()
-		}
-	}
+func writeScanOutput(result *types.Result) error {
+	return output.Write(result, output.FormatForPath(outputFlag), outputFlag)
 }
 
 func init() {

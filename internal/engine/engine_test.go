@@ -39,10 +39,10 @@ func TestEngine_Scan(t *testing.T) {
 
 	e := New([]rules.Rule{
 		{
-			ID:       "HARDCODED_SECRET",
-			Name:     "Hardcoded Secret",
-			Severity: "SEVERE",
-			Category: "security",
+			ID:        "HARDCODED_SECRET",
+			Name:      "Hardcoded Secret",
+			Severity:  "SEVERE",
+			Category:  "security",
 			Languages: []string{"go", "python"},
 			Patterns: []rules.Pattern{
 				{Type: "regex", Pattern: "(?i)(password|token)\\s*[=:]\\s*[\"'][^\"']{8,}[\"']", Comment: "Possible hardcoded secret"},
@@ -80,20 +80,20 @@ func TestEngine_Scan_SecurityFilter(t *testing.T) {
 	// Create rules: one security, one performance
 	e := New([]rules.Rule{
 		{
-			ID:       "HARDCODED_SECRET",
-			Name:     "Hardcoded Secret",
-			Severity: "SEVERE",
-			Category: "security",
+			ID:        "HARDCODED_SECRET",
+			Name:      "Hardcoded Secret",
+			Severity:  "SEVERE",
+			Category:  "security",
 			Languages: []string{"go"},
 			Patterns: []rules.Pattern{
 				{Type: "regex", Pattern: "(?i)password", Comment: "hardcoded secret"},
 			},
 		},
 		{
-			ID:       "GOROUTINE_LEAK",
-			Name:     "Goroutine Leak",
-			Severity: "WARNING",
-			Category: "performance",
+			ID:        "GOROUTINE_LEAK",
+			Name:      "Goroutine Leak",
+			Severity:  "WARNING",
+			Category:  "performance",
 			Languages: []string{"go"},
 			Patterns: []rules.Pattern{
 				{Type: "regex", Pattern: "go\\s+func\\s*\\(", Comment: "goroutine"},
@@ -135,20 +135,20 @@ func main() {
 
 	e := New([]rules.Rule{
 		{
-			ID:       "HARDCODED_SECRET",
-			Name:     "Hardcoded Secret",
-			Severity: "SEVERE",
-			Category: "security",
+			ID:        "HARDCODED_SECRET",
+			Name:      "Hardcoded Secret",
+			Severity:  "SEVERE",
+			Category:  "security",
 			Languages: []string{"go"},
 			Patterns: []rules.Pattern{
 				{Type: "regex", Pattern: "(?i)password", Comment: "hardcoded secret"},
 			},
 		},
 		{
-			ID:       "GOROUTINE_LEAK",
-			Name:     "Goroutine Leak",
-			Severity: "WARNING",
-			Category: "performance",
+			ID:        "GOROUTINE_LEAK",
+			Name:      "Goroutine Leak",
+			Severity:  "WARNING",
+			Category:  "performance",
 			Languages: []string{"go"},
 			Patterns: []rules.Pattern{
 				{Type: "regex", Pattern: "go\\s+func\\s*\\(", Comment: "goroutine"},
@@ -190,20 +190,20 @@ func main() {
 
 	e := New([]rules.Rule{
 		{
-			ID:       "HARDCODED_SECRET",
-			Name:     "Hardcoded Secret",
-			Severity: "SEVERE",
-			Category: "security",
+			ID:        "HARDCODED_SECRET",
+			Name:      "Hardcoded Secret",
+			Severity:  "SEVERE",
+			Category:  "security",
 			Languages: []string{"go"},
 			Patterns: []rules.Pattern{
 				{Type: "regex", Pattern: "(?i)password", Comment: "hardcoded secret"},
 			},
 		},
 		{
-			ID:       "GOROUTINE_LEAK",
-			Name:     "Goroutine Leak",
-			Severity: "WARNING",
-			Category: "performance",
+			ID:        "GOROUTINE_LEAK",
+			Name:      "Goroutine Leak",
+			Severity:  "WARNING",
+			Category:  "performance",
 			Languages: []string{"go"},
 			Patterns: []rules.Pattern{
 				{Type: "regex", Pattern: "go\\s+func\\s*\\(", Comment: "goroutine"},
@@ -276,10 +276,10 @@ func TestEngine_Scan_SkipDirectories(t *testing.T) {
 
 	e := New([]rules.Rule{
 		{
-			ID:       "HARDCODED_SECRET",
-			Name:     "Hardcoded Secret",
-			Severity: "SEVERE",
-			Category: "security",
+			ID:        "HARDCODED_SECRET",
+			Name:      "Hardcoded Secret",
+			Severity:  "SEVERE",
+			Category:  "security",
 			Languages: []string{"go", "python", "javascript"},
 			Patterns: []rules.Pattern{
 				{Type: "regex", Pattern: "(?i)password", Comment: "hardcoded secret"},
@@ -324,10 +324,10 @@ func TestEngine_Scan_ExcludePattern(t *testing.T) {
 
 	e := New([]rules.Rule{
 		{
-			ID:       "HARDCODED_SECRET",
-			Name:     "Hardcoded Secret",
-			Severity: "SEVERE",
-			Category: "security",
+			ID:        "HARDCODED_SECRET",
+			Name:      "Hardcoded Secret",
+			Severity:  "SEVERE",
+			Category:  "security",
 			Languages: []string{"go"},
 			Patterns: []rules.Pattern{
 				{Type: "regex", Pattern: "(?i)password", Comment: "hardcoded secret"},
@@ -364,10 +364,10 @@ token = "hardcoded456"
 
 	e := New([]rules.Rule{
 		{
-			ID:       "HARDCODED_SECRET",
-			Name:     "Hardcoded Secret",
-			Severity: "SEVERE",
-			Category: "security",
+			ID:        "HARDCODED_SECRET",
+			Name:      "Hardcoded Secret",
+			Severity:  "SEVERE",
+			Category:  "security",
 			Languages: []string{"go"},
 			Patterns: []rules.Pattern{
 				{Type: "regex", Pattern: "(?i)(password|token)", Comment: "hardcoded secret"},
@@ -398,10 +398,10 @@ func TestEngine_Scan_UnknownExtension(t *testing.T) {
 
 	e := New([]rules.Rule{
 		{
-			ID:       "HARDCODED_SECRET",
-			Name:     "Hardcoded Secret",
-			Severity: "SEVERE",
-			Category: "security",
+			ID:        "HARDCODED_SECRET",
+			Name:      "Hardcoded Secret",
+			Severity:  "SEVERE",
+			Category:  "security",
 			Languages: []string{"go"},
 			Patterns: []rules.Pattern{
 				{Type: "regex", Pattern: "(?i)password", Comment: "hardcoded secret"},
@@ -433,10 +433,10 @@ func TestEngine_Scan_ReadError(t *testing.T) {
 
 	e := New([]rules.Rule{
 		{
-			ID:       "HARDCODED_SECRET",
-			Name:     "Hardcoded Secret",
-			Severity: "SEVERE",
-			Category: "security",
+			ID:        "HARDCODED_SECRET",
+			Name:      "Hardcoded Secret",
+			Severity:  "SEVERE",
+			Category:  "security",
 			Languages: []string{"go"},
 			Patterns: []rules.Pattern{
 				{Type: "regex", Pattern: "(?i)password", Comment: "hardcoded secret"},
@@ -490,10 +490,10 @@ func TestEngine_Scan_NoMatchingRule(t *testing.T) {
 	// Create rule for Python only
 	e := New([]rules.Rule{
 		{
-			ID:       "HARDCODED_SECRET",
-			Name:     "Hardcoded Secret",
-			Severity: "SEVERE",
-			Category: "security",
+			ID:        "HARDCODED_SECRET",
+			Name:      "Hardcoded Secret",
+			Severity:  "SEVERE",
+			Category:  "security",
 			Languages: []string{"python"}, // Go file should not match
 			Patterns: []rules.Pattern{
 				{Type: "regex", Pattern: "(?i)password", Comment: "hardcoded secret"},
@@ -523,10 +523,10 @@ func TestEngine_Scan_EmptySeverity(t *testing.T) {
 	// Create rule without severity
 	e := New([]rules.Rule{
 		{
-			ID:       "HARDCODED_SECRET",
-			Name:     "Hardcoded Secret",
+			ID:   "HARDCODED_SECRET",
+			Name: "Hardcoded Secret",
 			// Severity is empty - should default to WARNING
-			Category: "security",
+			Category:  "security",
 			Languages: []string{"go"},
 			Patterns: []rules.Pattern{
 				{Type: "regex", Pattern: "(?i)password", Comment: "hardcoded secret"},

@@ -1,7 +1,7 @@
 # Testing Guide
 
-> **Version:** 0.3.0
-> **Last Updated:** 2026-04-22
+> **Version:** 1.0.0
+> **Last Updated:** 2026-04-23
 
 ## Overview
 
@@ -25,6 +25,13 @@ go test -v ./...
 
 # Run with coverage
 go test -cover ./...
+
+# Run the full CI-style local checks
+unformatted="$(gofmt -l $(git ls-files '*.go' ':!:testdata/**'))"
+test -z "$unformatted" || { echo "$unformatted"; exit 1; }
+go vet ./...
+go test ./... -coverprofile=coverage.out
+go build ./cmd/goreview
 
 # Run tests for a specific package
 go test -v ./internal/engine/...
@@ -196,12 +203,17 @@ go tool cover -html=coverage.out -o coverage.html
 
 ### Coverage Targets
 
-| Package | Target |
-|---------|--------|
-| `internal/engine/` | ≥ 80% |
-| `internal/parser/` | ≥ 80% |
-| `internal/rules/` | ≥ 80% |
-| `internal/abcoder/` | ≥ 70% |
+Coverage targets are tracked as package-specific baselines rather than a single global gate. Raise the baseline when adding tests; do not lower it to pass CI.
+
+| Package | Current Baseline | Near-Term Goal |
+|---------|------------------|----------------|
+| `cmd/goreview/` | about 20% | Add command execution coverage for scan/languages/version |
+| `internal/output/` | about 87% | Keep JSON/SARIF/text behavior covered |
+| `langs/javascript/` | needs dedicated parser tests | Add parity tests with TypeScript parser behavior |
+| `internal/engine/` | about 49% | Raise toward 60%+ |
+| `internal/parser/` | about 48% | Raise toward 60%+ |
+| `internal/rules/` | about 81% | Keep at or above 80% |
+| `internal/abcoder/` | about 68% | Raise toward 70%+ |
 
 ## Mocking
 

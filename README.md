@@ -40,7 +40,7 @@ A fast, extensible static analysis and AI-powered code review tool with support 
 go install github.com/Colin4k1024/codesentry/cmd/goreview@latest
 ```
 
-This installs the `goreview` binary to your `$GOPATH/bin` directory. Make sure `$GOPATH/bin` is in your `$PATH`.
+This installs the `goreview` binary to your `$GOPATH/bin` directory. Make sure `$GOPATH/bin` is in your `$PATH`, then run commands such as `goreview scan ./src`.
 
 ### From Source
 
@@ -52,7 +52,7 @@ go build -o goreview ./cmd/goreview
 
 ### Pre-built Binary
 
-Download from the [Releases](https://github.com/Colin4k1024/codesentry/releases) page.
+Download from the [Releases](https://github.com/Colin4k1024/codesentry/releases) page. Current pre-built release artifacts target macOS (`darwin/amd64` and `darwin/arm64`). Linux and Windows users should use `go install` or build from source.
 
 ## Quick Start
 
@@ -74,6 +74,9 @@ goreview scan ./src --security -o results.json
 
 # Output in SARIF format (CI/CD integration)
 goreview scan ./src --security -o results.sarif
+
+# Other output extensions write text format
+goreview scan ./src --security -o results.txt
 
 # List supported languages
 goreview languages
@@ -238,6 +241,8 @@ goreview:
 
 ## Output Formats
 
+When `-o` is provided, CodeSentry infers the output format from the file extension: `.json` writes JSON, `.sarif` writes SARIF 2.1.0, and any other extension writes text. Without `-o`, text output is printed to stdout.
+
 ### Text (Default)
 
 ```
@@ -284,4 +289,4 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed development guide including:
 
 ## License
 
-MIT License
+MIT License. See [LICENSE](LICENSE).

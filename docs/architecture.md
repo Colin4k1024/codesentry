@@ -1,7 +1,7 @@
 # CodeSentry Architecture
 
-> **Version:** 0.3.0
-> **Last Updated:** 2026-04-22
+> **Version:** 1.0.0
+> **Last Updated:** 2026-04-23
 
 ## Overview
 
@@ -223,9 +223,11 @@ Three output formats are supported:
 
 | Format   | File Extension | Use Case                                    |
 |----------|---------------|---------------------------------------------|
-| Text     | (stdout)      | Human-readable CLI output                   |
+| Text     | stdout, other | Human-readable CLI output                   |
 | JSON     | `.json`       | Scripted processing, CI integration          |
 | SARIF    | `.sarif`      | GitHub Code Scanning, GitLab SAST, tools    |
+
+The `scan -o <path>` command infers the format from the output file extension. Unknown extensions fall back to text.
 
 SARIF output follows the [OASIS SARIF 2.1.0](https://docs.oasis-open.org/sarif/sarif/v2.1.0/sarif-schema-v2.1.0.html) specification.
 
