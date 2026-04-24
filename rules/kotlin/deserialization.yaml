@@ -1,0 +1,17 @@
+id: KT_DESERIALIZATION
+name: Insecure Deserialization
+description: Detects use of ObjectInputStream or Kotlin serialization with insecure configuration
+severity: SEVERE
+category: security
+languages: [kotlin]
+suggestion: Use secure serialization libraries or validate input thoroughly before deserialization
+patterns:
+  - type: regex
+    pattern: 'ObjectInputStream\s*\('
+    comment: Insecure deserialization - ObjectInputStream can execute arbitrary code
+  - type: regex
+    pattern: 'Kotlin\.Serialization\.decodeFrom\w*\s*\([^)]*Unsafe'
+    comment: Insecure deserialization with unsafe configuration
+  - type: regex
+    pattern: 'Json\.decodeFromString\s*\([^)]*JSON\.IgnoreUnknown'
+    comment: Deserialization with permissive configuration - ensure input validation

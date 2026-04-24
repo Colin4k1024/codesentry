@@ -1,0 +1,17 @@
+id: SWIFT_SSRF
+name: Server-Side Request Forgery
+description: Detects use of URLSession with user-controlled URLs that could allow SSRF attacks
+severity: SEVERE
+category: security
+languages: [swift]
+suggestion: Validate and whitelist URLs before making requests
+patterns:
+  - type: regex
+    pattern: 'URLSession\.shared\.dataTask\s*\([^)]+\+[^)]+\)'
+    comment: SSRF risk - URL built with string concatenation
+  - type: regex
+    pattern: 'URL\s*\([^)]+\+[^)]+\)\.absoluteString'
+    comment: SSRF risk - URL constructed with concatenation
+  - type: regex
+    pattern: 'NSURLConnection\.sendSynchronousRequest\s*\([^)]+\+'
+    comment: SSRF risk - NSURLConnection with concatenated URL

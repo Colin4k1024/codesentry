@@ -1,0 +1,21 @@
+id: JAVA_XSS
+name: Cross-Site Scripting
+description: Detects potential XSS vulnerabilities in Java web applications
+severity: SEVERE
+category: security
+languages:
+  - java
+suggestion: Sanitize user input before rendering in web pages, use output encoding libraries
+patterns:
+  - type: regex
+    pattern: 'response\.getWriter\(\)\.write\s*\([^)]+\+[^)]+\)'
+    comment: Potential XSS - unescaped output of user input
+  - type: regex
+    pattern: 'out\.print(ln)?\s*\([^)]+\+[^)]+\)'
+    comment: Potential XSS - unescaped output via out.print
+  - type: regex
+    pattern: 'StringEscapeUtils\.unescapeHtml4\s*\('
+    comment: Unescaping HTML - verify data is sanitized before output
+  - type: regex
+    pattern: 'setContentType.*text/html'
+    comment: HTML content type - ensure proper output encoding to prevent XSS

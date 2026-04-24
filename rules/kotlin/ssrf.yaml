@@ -1,0 +1,23 @@
+id: KT_SSRF
+name: Server-Side Request Forgery
+description: Detects use of HttpClient or URL with user-controlled URLs that could allow SSRF attacks
+severity: SEVERE
+category: security
+languages: [kotlin]
+suggestion: Validate and whitelist URLs before making requests
+patterns:
+  - type: regex
+    pattern: 'URL\s*\([^)]+\)\.openConnection\s*\('
+    comment: SSRF risk - URLConnection with user-controlled URL
+  - type: regex
+    pattern: 'HttpClient\.newHttpClient\s*\(\s*\)\.send\s*\([^)]+\+'
+    comment: SSRF risk - HttpClient with concatenated URL
+  - type: regex
+    pattern: 'RestTemplate\s*\([^)]*\)\.getForObject\s*\([^)]+\+'
+    comment: SSRF risk - RestTemplate with concatenated URL
+  - type: regex
+    pattern: 'OkHttpClient.*\.newCall\s*\([^)]+\+'
+    comment: SSRF risk - OkHttpClient with concatenated URL
+  - type: regex
+    pattern: 'WebClient\.create.*\.getForObject\s*\([^)]+\+'
+    comment: SSRF risk - Spring WebClient with concatenated URL

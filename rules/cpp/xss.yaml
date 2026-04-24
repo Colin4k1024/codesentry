@@ -1,0 +1,17 @@
+id: CPP_XSS
+name: Cross-Site Scripting
+description: Detects potential XSS vulnerabilities in C++ web applications
+severity: SEVERE
+category: security
+languages: [cpp]
+suggestion: Sanitize user input before rendering in web pages, use output encoding
+patterns:
+  - type: regex
+    pattern: 'cout\s*<<\s*[^;]+\+\s*[^;]+'
+    comment: Potential XSS - unescaped output of user input
+  - type: regex
+    pattern: 'printf\s*\([^)]*%s[^)]*\)'
+    comment: Potential XSS - printf with %s from user input
+  - type: regex
+    pattern: 'std::cout\s*<<\s*request\.'
+    comment: Potential XSS - direct output of request data without sanitization

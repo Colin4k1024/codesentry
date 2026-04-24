@@ -1,0 +1,17 @@
+id: SWIFT_SQL_INJECTION
+name: SQL Injection
+description: Detects string concatenation in SQL queries in Swift
+severity: SEVERE
+category: security
+languages: [swift]
+suggestion: Use parameterized queries or an ORM like GRDB
+patterns:
+  - type: regex
+    pattern: 'executeQuery\s*\([^)]+\+[^)]+\)'
+    comment: String concatenation in SQL query - SQL injection risk
+  - type: regex
+    pattern: 'db\.execute\s*\(\s*statement\s*:\s*\"[^\"]*\\+'
+    comment: String interpolation in SQL statement - SQL injection risk
+  - type: regex
+    pattern: 'NSMutableString\.stringWithFormat:.*\+'
+    comment: SQL query built with string concatenation

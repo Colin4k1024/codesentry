@@ -1,0 +1,20 @@
+id: SWIFT_PATH_TRAVERSAL
+name: Path Traversal
+description: Detects file operations using unsanitized user input that could allow path traversal attacks
+severity: SEVERE
+category: security
+languages: [swift]
+suggestion: Validate and sanitize file paths, use URL.standardized to resolve symlinks
+patterns:
+  - type: regex
+    pattern: 'FileManager\.default\.contents(atPath:)\s*\([^)]+\s*\+'
+    comment: FileManager with concatenated path - path traversal risk
+  - type: regex
+    pattern: 'String\.contents(of:encoding:)\s*\([^)]+\s*\+'
+    comment: File path built via string concatenation - path traversal risk
+  - type: regex
+    pattern: 'Data\.write(to:)\s*\([^)]+\s*\+'
+    comment: File path built via string concatenation - path traversal risk
+  - type: regex
+    pattern: 'URL\s*\([^)]+\+[^)]+\)\.path'
+    comment: Path built with string concatenation - path traversal risk

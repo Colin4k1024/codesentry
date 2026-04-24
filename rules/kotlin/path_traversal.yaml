@@ -1,0 +1,20 @@
+id: KT_PATH_TRAVERSAL
+name: Path Traversal
+description: Detects file operations using unsanitized user input that could allow path traversal attacks
+severity: SEVERE
+category: security
+languages: [kotlin]
+suggestion: Validate and sanitize file paths, use getCanonicalPath to resolve symlinks
+patterns:
+  - type: regex
+    pattern: 'File\s*\([^)]+\s*\+\s*[^)]+\)'
+    comment: File path built via string concatenation - path traversal risk
+  - type: regex
+    pattern: 'FileInputStream\s*\([^)]+\s*\+\s*[^)]+\)'
+    comment: FileInputStream with concatenated path - path traversal risk
+  - type: regex
+    pattern: 'FileOutputStream\s*\([^)]+\s*\+\s*[^)]+\)'
+    comment: FileOutputStream with concatenated path - path traversal risk
+  - type: regex
+    pattern: 'Paths\.get\s*\([^)]+\s*\+\s*[^)]+\)'
+    comment: Paths.get with string concatenation - path traversal risk
