@@ -1,9 +1,13 @@
-# .goreleaser.yaml for CodeSentry
-# https://goreleaser.com
+# .goreleaser.yaml for CodeSentry v1.0+
+# CGO is required due to cloudwego/abcoder → go-tree-sitter (C bindings)
 
 version: 2
 
 project_name: codesentry
+
+before:
+  hooks:
+    - go mod download
 
 builds:
   - id: goreview-darwin
@@ -16,6 +20,36 @@ builds:
       - arm64
     env:
       - CGO_ENABLED=1
+
+  - id: goreview-linux
+    main: ./cmd/goreview
+    binary: goreview
+    goos:
+      - linux
+    goarch:
+      - amd64
+    env:
+      - CGO_ENABLED=1
+
+  - id: goreview-windows
+    main: ./cmd/goreview
+    binary: goreview.exe
+    goos:
+      - windows
+    goarch:
+      - amd64
+    env:
+      - CGO_ENABLED=1
+
+archives:
+  - id: default
+    format_overrides:
+      - goos: windows
+        format: zip
+    files:
+      - rules/**
+      - LICENSE
+      - README.md
 
 checksum:
   algorithm: sha256
@@ -34,3 +68,4 @@ changelog:
       - '^docs:'
       - '^test:'
       - '^chore:'
+      - '^CI:'

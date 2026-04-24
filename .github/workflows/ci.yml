@@ -8,7 +8,13 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        go-version: ['1.23', '1.24']
+
+    runs-on: ${{ matrix.os }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -16,12 +22,13 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.23'
+          go-version: ${{ matrix.go-version }}
 
       - name: Check formatting
         run: |
           unformatted="$(gofmt -l $(git ls-files '*.go' ':!:testdata/**'))"
           if [ -n "$unformatted" ]; then
+            echo "Unformatted files:"
             echo "$unformatted"
             exit 1
           fi
@@ -36,6 +43,7 @@ jobs:
         run: go build -o goreview ./cmd/goreview
 
       - name: CodeSentry smoke scan
+        if: matrix.os != 'windows-latest'
         run: |
           ./goreview scan . --security --no-ai \
             --exclude _test.go \
@@ -44,6 +52,73 @@ jobs:
             --exclude skills \
             -o /tmp/codesentry-smoke.txt
           test -s /tmp/codesentry-smoke.txt
+
+      - name: Build Windows
+        if: matrix.os == 'windows-latest'
+        shell: bash
+        run: |
+          ./goreview.exe scan . --security --no-ai \
+            --exclude _test.go \
+            --exclude testdata \
+            --exclude docs \
+            --exclude skills \
+            -o NUL
+
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
+
+      - name: Run golangci-lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: latest
+          args: --timeout=5m
+
+  security:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          scanners: 'vuln'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'MEDIUM,HIGH,CRITICAL'
+
+      - name: Upload Trivy results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
+          category: 'trivy'
+
+      - name: Run Trivy dependency scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: 'go.mod'
+          scanners: 'vuln'
+          format: 'table'
+          exit-code: '0'
 
   coverage:
     runs-on: ubuntu-latest
@@ -54,7 +129,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.23'
+          go-version: '1.24'
 
       - name: Run tests with coverage
         run: |
@@ -67,3 +142,37 @@ jobs:
         with:
           name: coverage
           path: coverage.html
+
+  scan:
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
+
+      - name: Build
+        run: go build -o goreview ./cmd/goreview
+
+      - name: Run CodeSentry SARIF scan
+        run: |
+          ./goreview scan . --security --no-ai \
+            --exclude _test.go \
+            --exclude testdata \
+            --exclude docs \
+            --exclude skills \
+            --format sarif \
+            -o codesentry-results.sarif
+
+      - name: Upload CodeSentry scan to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'codesentry-results.sarif'
+          category: 'codesentry'
