@@ -1,4 +1,4 @@
-id: TSPrototype_POLLUTION
+id: TS_PROTOTYPE_POLLUTION
 name: Prototype Pollution
 description: Detects object merging or copying that could cause prototype pollution
 severity: SEVERE

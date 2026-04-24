@@ -137,7 +137,7 @@ func TestWriteSARIFFile(t *testing.T) {
 
 func TestWriteUnknownFormatFallsBackToText(t *testing.T) {
 	outputPath := filepath.Join(t.TempDir(), "results.unknown")
-	if err := Write(testResult(), Format("unknown"), outputPath); err != nil {
+	if err := Write(testResult(), ParseFormat("unknown"), outputPath); err != nil {
 		t.Fatalf("Write returned error: %v", err)
 	}
 
@@ -147,5 +147,93 @@ func TestWriteUnknownFormatFallsBackToText(t *testing.T) {
 	}
 	if !strings.Contains(string(data), "CodeSentry Scan Results") {
 		t.Error("unknown format should fall back to text")
+	}
+}
+
+func TestParseFormat(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected Format
+	}{
+		{"json", FormatJSON},
+		{"sarif", FormatSarif},
+		{"ghsl", FormatGHSL},
+		{"clang", FormatCLang},
+		{"text", FormatText},
+		{"JSON", FormatJSON},
+		{"unknown", FormatText},
+	}
+	for _, tt := range tests {
+		got := ParseFormat(tt.input)
+		if got != tt.expected {
+			t.Errorf("ParseFormat(%q) = %v, want %v", tt.input, got, tt.expected)
+		}
+	}
+}
+
+func TestFormatForPathGHSL(t *testing.T) {
+	if got := FormatForPath("results.ghsl"); got != FormatGHSL {
+		t.Errorf("FormatForPath results.ghsl = %v, want %v", got, FormatGHSL)
+	}
+}
+
+func TestFormatForPathCLang(t *testing.T) {
+	if got := FormatForPath("results.clang"); got != FormatCLang {
+		t.Errorf("FormatForPath results.clang = %v, want %v", got, FormatCLang)
+	}
+}
+
+func TestWriteGHSLFile(t *testing.T) {
+	outputPath := filepath.Join(t.TempDir(), "results.ghsl")
+	if err := Write(testResult(), FormatGHSL, outputPath); err != nil {
+		t.Fatalf("Write returned error: %v", err)
+	}
+	data, err := os.ReadFile(outputPath)
+	if err != nil {
+		t.Fatalf("failed to read output file: %v", err)
+	}
+	var out map[string]interface{}
+	if err := json.Unmarshal(data, &out); err != nil {
+		t.Fatalf("GHSL output is invalid JSON: %v", err)
+	}
+	if out["tool"] != "CodeSentry goreview" {
+		t.Errorf("GHSL tool = %v, want 'CodeSentry goreview'", out["tool"])
+	}
+}
+
+func TestWriteCLangFile(t *testing.T) {
+	outputPath := filepath.Join(t.TempDir(), "results.clang")
+	if err := Write(testResult(), FormatCLang, outputPath); err != nil {
+		t.Fatalf("Write returned error: %v", err)
+	}
+	data, err := os.ReadFile(outputPath)
+	if err != nil {
+		t.Fatalf("failed to read output file: %v", err)
+	}
+	if !strings.Contains(string(data), "app.go:12:3") {
+		t.Error("CLang output should contain issue location")
+	}
+}
+
+func TestSetColorEnabled(t *testing.T) {
+	SetColorEnabled(false)
+	SetColorEnabled(true)
+}
+
+func TestMapSeverityToSarifLevel(t *testing.T) {
+	tests := []struct {
+		severity string
+		expected string
+	}{
+		{types.SEVERE, "error"},
+		{types.WARNING, "warning"},
+		{types.INFO, "note"},
+		{"UNKNOWN", "warning"},
+	}
+	for _, tt := range tests {
+		got := mapSeverityToSarifLevel(tt.severity)
+		if got != tt.expected {
+			t.Errorf("mapSeverityToSarifLevel(%q) = %v, want %v", tt.severity, got, tt.expected)
+		}
 	}
 }

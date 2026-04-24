@@ -219,7 +219,7 @@ When abcoder is unavailable (non-Go files, parse errors), `FallbackHandler` prov
 
 ### 7. Output (`internal/output/`)
 
-Three output formats are supported:
+Three output formats are currently implemented:
 
 | Format   | File Extension | Use Case                                    |
 |----------|---------------|---------------------------------------------|

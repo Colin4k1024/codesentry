@@ -153,7 +153,7 @@ lodash.merge({}, ...userData);`
 	allRules := rules.LoadRules(rulesDir)
 	var tsRules []rules.Rule
 	for _, r := range allRules {
-		if r.ID == "TSPrototype_POLLUTION" {
+		if r.ID == "TS_PROTOTYPE_POLLUTION" {
 			tsRules = append(tsRules, r)
 		}
 	}
