@@ -1,0 +1,23 @@
+id: RUBY_PATH_TRAVERSAL
+name: Path Traversal
+description: Detects file operations using unsanitized user input that could allow path traversal attacks
+severity: SEVERE
+category: security
+languages: [ruby]
+suggestion: Validate and sanitize file paths, use File.basename to strip directory components
+patterns:
+  - type: regex
+    pattern: 'File\.open\s*\([^)]+\s*\+\s*[^)]+\)'
+    comment: File path built via string concatenation
+  - type: regex
+    pattern: 'File\.read\s*\([^)]+\s*\+\s*[^)]+\)'
+    comment: File path built via string concatenation
+  - type: regex
+    pattern: 'File\.write\s*\([^)]+\s*\+\s*[^)]+\)'
+    comment: File path built via string concatenation
+  - type: regex
+    pattern: 'IO\.read\s*\([^)]+\s*\+\s*[^)]+\)'
+    comment: IO.read with concatenated path
+  - type: regex
+    pattern: 'send\s*\(\s*:open\s*,\s*[^)]+\s*\+\s*[^)]+\s*\)'
+    comment: send with path concatenation

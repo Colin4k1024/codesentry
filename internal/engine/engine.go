@@ -12,6 +12,12 @@ import (
 	"github.com/Colin4k1024/codesentry/internal/types"
 )
 
+// ProgressCallback is called before scanning each file
+// filePath: the file being scanned
+// current: current file index (1-based)
+// total: total number of files to scan
+type ProgressCallback func(filePath string, current int, total int)
+
 // Config holds configuration for scanning
 type Config struct {
 	Security    bool
@@ -19,6 +25,7 @@ type Config struct {
 	NoAI        bool
 	Output      string
 	Exclude     []string
+	Callback    ProgressCallback
 }
 
 // Engine is the core scanning engine
@@ -78,7 +85,12 @@ func (e *Engine) Scan(paths []string, cfg *Config) (*types.Result, error) {
 	}
 	// Process each file
 	seen := make(map[string]bool)
-	for _, filePath := range filesToScan {
+	for i, filePath := range filesToScan {
+		// Call progress callback before scanning each file
+		if cfg.Callback != nil {
+			cfg.Callback(filePath, i+1, len(filesToScan))
+		}
+
 		content, err := os.ReadFile(filePath)
 		if err != nil {
 			continue

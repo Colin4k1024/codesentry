@@ -1,0 +1,25 @@
+id: TS_SSRF
+name: Server-Side Request Forgery
+description: Detects use of fetch/axios with user-controlled URLs that could allow SSRF attacks
+severity: SEVERE
+category: security
+languages:
+  - typescript
+  - javascript
+suggestion: Validate and whitelist URLs before making requests
+patterns:
+  - type: regex
+    pattern: 'fetch\s*\([^)]+\+'
+    comment: SSRF risk - fetch URL built with concatenation
+  - type: regex
+    pattern: 'axios\.(get|post|put|delete|patch|request)\s*\(\s*\{[^}]*url[^}]*:\s*[^)]+\+'
+    comment: SSRF risk - axios URL built with concatenation
+  - type: regex
+    pattern: 'node-fetch\s*\([^)]+\+'
+    comment: SSRF risk - node-fetch URL built with concatenation
+  - type: regex
+    pattern: 'http\.(get|post|put|delete|request)\s*\([^)]+\+'
+    comment: SSRF risk - http module with concatenation
+  - type: regex
+    pattern: 'request\s*\(\s*\{[^}]*url[^}]*:\s*[^)]+\+'
+    comment: SSRF risk - request library URL built with concatenation

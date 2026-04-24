@@ -1,0 +1,17 @@
+id: JAVA_COMMAND_INJECTION
+name: Command Injection
+description: Detects use of Runtime.exec or ProcessBuilder with user input that could allow command injection
+severity: SEVERE
+category: security
+languages: [java]
+suggestion: Avoid Runtime.exec with string concatenation, use ProcessBuilder with array arguments
+patterns:
+  - type: regex
+    pattern: 'exec\s*\([^)]+\s*\+'
+    comment: exec with string concatenation
+  - type: regex
+    pattern: 'system\s*\([^)]+\s*\+'
+    comment: system() with string concatenation
+  - type: regex
+    pattern: 'Runtime\s*\.\s*exec\s*\([^)]+\s*\+'
+    comment: Runtime.exec with string concatenation

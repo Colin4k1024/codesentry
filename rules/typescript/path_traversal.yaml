@@ -1,0 +1,28 @@
+id: TS_PATH_TRAVERSAL
+name: Path Traversal
+description: Detects file operations using unsanitized user input that could allow path traversal attacks
+severity: SEVERE
+category: security
+languages:
+  - typescript
+  - javascript
+suggestion: Validate and sanitize file paths, use path.basename to strip directory components
+patterns:
+  - type: regex
+    pattern: 'fs\.readFileSync\s*\([^)]+\s*\+\s*[^)]+\)'
+    comment: File path built via string concatenation - path traversal risk
+  - type: regex
+    pattern: 'fs\.writeFileSync\s*\([^)]+\s*\+\s*[^)]+\)'
+    comment: File path built via string concatenation - path traversal risk
+  - type: regex
+    pattern: 'fs\.readFile\s*\([^)]+\s*\+\s*[^)]+\)'
+    comment: File path built via string concatenation - path traversal risk
+  - type: regex
+    pattern: 'fs\.writeFile\s*\([^)]+\s*\+\s*[^)]+\)'
+    comment: File path built via string concatenation - path traversal risk
+  - type: regex
+    pattern: 'require\s*\([^)]+\s*\+\s*[^)]+\)'
+    comment: Dynamic require with path concatenation - path traversal risk
+  - type: regex
+    pattern: 'import\s*\([^)]+\s*\+\s*[^)]+\)'
+    comment: Dynamic import with path concatenation - path traversal risk

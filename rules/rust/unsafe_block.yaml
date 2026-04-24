@@ -1,15 +1,17 @@
-id: RS_UNSAFE_BLOCK
-name: Unsafe Code Block
-description: Detects unsafe code blocks which bypass Rust safety guarantees
+id: RUST_UNSAFE_BLOCK
+name: Unsafe Block Usage
+description: Detects use of unsafe blocks in Rust code that bypasses memory safety guarantees
 severity: WARNING
 category: security
-languages:
-  - rust
-suggestion: Review unsafe code carefully and minimize its scope
+languages: [rust]
+suggestion: Ensure unsafe blocks are minimized and thoroughly documented with safety comments
 patterns:
   - type: regex
-    pattern: '\bunsafe\s*\{'
-    comment: Unsafe code block - review for memory safety
+    pattern: 'unsafe\s*\{'
+    comment: Unsafe block detected - ensure memory safety
   - type: regex
-    pattern: '\bunsafe\s*\('
-    comment: Unsafe function call
+    pattern: 'unsafe\s+fn\s+'
+    comment: Unsafe function - document safety invariants
+  - type: regex
+    pattern: 'unsafe\s+impl\s+'
+    comment: Unsafe impl - ensure trait safety

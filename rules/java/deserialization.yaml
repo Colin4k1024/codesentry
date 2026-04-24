@@ -1,18 +1,27 @@
 id: JAVA_DESERIALIZATION
 name: Insecure Deserialization
-description: Detects potentially unsafe deserialization in Java
+description: Detects use of ObjectInputStream or other insecure deserialization that could allow remote code execution
 severity: SEVERE
 category: security
 languages:
   - java
-suggestion: Use secure serialization or validate input thoroughly
+suggestion: Use secure serialization libraries or validate input thoroughly before deserialization
 patterns:
   - type: regex
-    pattern: '(?i)ObjectInputStream\s*\('
-    comment: Unsafe Java deserialization
+    pattern: 'new\s+ObjectInputStream\s*\('
+    comment: Insecure deserialization - ObjectInputStream can execute arbitrary code
   - type: regex
-    pattern: '(?i)readObject\s*\('
-    comment: Unsafe deserialization call
+    pattern: 'XMLDecoder\s*\('
+    comment: Insecure deserialization via XMLDecoder
   - type: regex
-    pattern: '(?i)XMLDecoder\s*\('
-    comment: Unsafe XML decoding
+    pattern: 'XStream\s*\(\s*new\s+HierarchicalStreamDriver'
+    comment: Insecure XStream deserialization - use safe converter
+  - type: regex
+    pattern: 'readObject\s*\(\s*\)'
+    comment: Dangerous readObject call - ensure input validation
+  - type: regex
+    pattern: 'readResolve\s*\(\s*\)'
+    comment: readResolve method - ensure proper serialization validation
+  - type: regex
+    pattern: 'ObjectMapper\.readValue\s*\([^,]+,\s*Object\.class\)'
+    comment: Polymorphic deserialization - enable type checking

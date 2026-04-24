@@ -1,0 +1,21 @@
+id: CPP_COMMAND_INJECTION
+name: Command Injection
+description: Detects use of system or popen with user input that could allow command injection
+severity: SEVERE
+category: security
+languages:
+  - cpp
+suggestion: Avoid system() and popen() with string concatenation, use exec family with arguments array
+patterns:
+  - type: regex
+    pattern: 'system\s*\([^)]+\s*\+'
+    comment: system() with string concatenation - command injection risk
+  - type: regex
+    pattern: 'popen\s*\([^)]+\s*\+'
+    comment: popen() with string concatenation - command injection risk
+  - type: regex
+    pattern: 'execlp?\s*\([^)]+\s*\+'
+    comment: execl/execlp with concatenation - command injection risk
+  - type: regex
+    pattern: 'execvp?\s*\([^)]+\s*\+'
+    comment: execv/execvp with concatenation - command injection risk

@@ -1,0 +1,27 @@
+id: RUST_PATH_TRAVERSAL
+name: Path Traversal
+description: Detects file operations using unsanitized user input that could allow path traversal attacks
+severity: SEVERE
+category: security
+languages:
+  - rust
+suggestion: Validate and sanitize file paths, use std::path::Path canonicalization
+patterns:
+  - type: regex
+    pattern: 'std::fs::read\s*\([^)]+\s*\+\s*[^)]+\)'
+    comment: File path built via string concatenation - path traversal risk
+  - type: regex
+    pattern: 'std::fs::write\s*\([^)]+\s*\+\s*[^)]+\)'
+    comment: File path built via string concatenation - path traversal risk
+  - type: regex
+    pattern: 'std::fs::read_to_string\s*\([^)]+\s*\+\s*[^)]+\)'
+    comment: File path built via string concatenation - path traversal risk
+  - type: regex
+    pattern: 'std::fs::write\s*\([^)]+\s*\+\s*[^)]+\)'
+    comment: File path built via string concatenation - path traversal risk
+  - type: regex
+    pattern: 'File::open\s*\([^)]+\s*\+\s*[^)]+\)'
+    comment: File::open with concatenated path - path traversal risk
+  - type: regex
+    pattern: 'std::path::Path::new\s*\([^)]+\s*\+\s*[^)]+\)'
+    comment: Path constructed with string concatenation - path traversal risk

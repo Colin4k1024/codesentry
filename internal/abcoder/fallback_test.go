@@ -2,6 +2,8 @@ package abcoder
 
 import (
 	"testing"
+
+	"github.com/Colin4k1024/codesentry/internal/rules"
 )
 
 func TestNewFallbackHandler(t *testing.T) {
@@ -96,29 +98,135 @@ func (e *testError) Error() string {
 	return e.msg
 }
 
-func TestFallbackHandler_FormatFallback(t *testing.T) {
-	handler := NewFallbackHandler()
-
-	output := handler.FormatFallback("SQL_INJECTION", "")
-	if output == "" {
-		t.Error("FormatFallback returned empty string")
-	}
-
-	// Should contain key elements
-	if !containsString(output, "修复建议") {
-		t.Error("FormatFallback missing '修复建议'")
-	}
-	if !containsString(output, "SQL") && !containsString(output, "parameterized") {
-		// The fix pattern should be mentioned
-	}
-}
-
 func TestFallbackHandler_BuildSuggestion(t *testing.T) {
 	handler := NewFallbackHandler()
 
-	// Test with known rule ID
-	suggestion := handler.BuildSuggestion(nil)
-	if suggestion == "" {
-		t.Error("BuildSuggestion returned empty string")
+	tests := []struct {
+		name       string
+		rule       *rules.Rule
+		wantPrefix string
+	}{
+		{
+			name:       "nil rule returns default",
+			rule:       nil,
+			wantPrefix: "Review and fix",
+		},
+		{
+			name: "rule with suggestion",
+			rule: &rules.Rule{
+				ID:         "CUSTOM_RULE",
+				Name:       "Custom Rule",
+				Suggestion: "Custom suggestion",
+				Category:   "security",
+			},
+			wantPrefix: "Custom suggestion",
+		},
+		{
+			name: "rule with known fallback fix",
+			rule: &rules.Rule{
+				ID:       "SQL_INJECTION",
+				Name:     "SQL Injection",
+				Category: "security",
+			},
+			wantPrefix: "Use parameterized queries",
+		},
+		{
+			name: "rule with category security no suggestion",
+			rule: &rules.Rule{
+				ID:       "UNKNOWN_SECURITY",
+				Name:     "Unknown Security Issue",
+				Category: "security",
+			},
+			wantPrefix: "Security issue detected",
+		},
+		{
+			name: "rule with category performance no suggestion",
+			rule: &rules.Rule{
+				ID:       "UNKNOWN_PERF",
+				Name:     "Unknown Performance Issue",
+				Category: "performance",
+			},
+			wantPrefix: "Performance issue detected",
+		},
+		{
+			name: "rule with unknown category",
+			rule: &rules.Rule{
+				ID:       "UNKNOWN_OTHER",
+				Name:     "Unknown Issue",
+				Category: "other",
+			},
+			wantPrefix: "Code issue detected",
+		},
 	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := handler.BuildSuggestion(tt.rule)
+			if result == "" {
+				t.Fatal("BuildSuggestion returned empty string")
+			}
+			if !containsSubstr(result, tt.wantPrefix) {
+				t.Errorf("BuildSuggestion() = %q, want to contain %q", result, tt.wantPrefix)
+			}
+		})
+	}
+}
+
+func TestFallbackHandler_FormatFallback(t *testing.T) {
+	handler := NewFallbackHandler()
+
+	tests := []struct {
+		name       string
+		ruleID     string
+		suggestion string
+		wantParts  []string
+	}{
+		{
+			name:       "known rule with suggestion",
+			ruleID:     "SQL_INJECTION",
+			suggestion: "Additional info",
+			wantParts:  []string{"修复建议", "String concatenation in SQL query", "parameterized"},
+		},
+		{
+			name:       "known rule with same suggestion as template",
+			ruleID:     "HARDCODED_SECRET",
+			suggestion: "Use environment variables: os.Getenv(\"KEY\")",
+			wantParts:  []string{"修复建议", "Hardcoded sensitive value"},
+		},
+		{
+			name:       "unknown rule returns original suggestion",
+			ruleID:     "UNKNOWN_RULE_XYZ",
+			suggestion: "Custom suggestion",
+			wantParts:  []string{"Custom suggestion"},
+		},
+		{
+			name:       "unknown rule with empty suggestion",
+			ruleID:     "UNKNOWN_RULE_EMPTY",
+			suggestion: "",
+			wantParts:  []string{""},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := handler.FormatFallback(tt.ruleID, tt.suggestion)
+			if result == "" && len(tt.wantParts) > 0 && tt.wantParts[0] != "" {
+				t.Error("FormatFallback returned empty string")
+			}
+			for _, part := range tt.wantParts {
+				if part != "" && !containsSubstr(result, part) {
+					t.Errorf("FormatFallback(%q, %q) = %q, want to contain %q", tt.ruleID, tt.suggestion, result, part)
+				}
+			}
+		})
+	}
+}
+
+func containsSubstr(s, substr string) bool {
+	for i := 0; i <= len(s)-len(substr); i++ {
+		if s[i:i+len(substr)] == substr {
+			return true
+		}
+	}
+	return false
 }

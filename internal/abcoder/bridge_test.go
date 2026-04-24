@@ -139,18 +139,18 @@ func TestParseIdentity(t *testing.T) {
 	// Test parseIdentity with different formats
 	tests := []struct {
 		nodeID string
-		// Just test that it doesn't panic
+		name   string
 	}{
-		{"Name"},
-		{"PkgPath#Name"},
-		{"ModPath?PkgPath#Name"},
+		{"Name", "Name"},
+		{"PkgPath#Name", "Name"},
+		{"ModPath?PkgPath#Name", "Name"},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.nodeID, func(t *testing.T) {
 			identity := parseIdentity(tt.nodeID)
-			if identity.Name == "" && tt.nodeID != "" {
-				t.Error("parseIdentity returned empty name")
+			if identity.Name != tt.name {
+				t.Errorf("parseIdentity(%q).Name = %q, want %q", tt.nodeID, identity.Name, tt.name)
 			}
 		})
 	}

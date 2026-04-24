@@ -1,0 +1,20 @@
+id: TS_WEAK_RANDOM
+name: Weak Random Number Generation
+description: Detects use of Math.random() for security-sensitive purposes which is not cryptographically secure
+severity: WARNING
+category: security
+languages: [typescript, javascript]
+suggestion: Use crypto.getRandomValues() or the Web Crypto API for security-sensitive randomness
+patterns:
+  - type: regex
+    pattern: 'Math\.random\s*\('
+    comment: Math.random is not cryptographically secure
+  - type: regex
+    pattern: 'Date\.now\s*\(\s*\)\s*%\s*\d+'
+    comment: Date-based randomness is predictable
+  - type: regex
+    pattern: 'new Date\(\)\.getTime\s*\(\s*\)'
+    comment: Timestamp-based randomness is predictable
+  - type: regex
+    pattern: 'Math\.floor\s*\(\s*Math\.random\s*\(\s*\)\s*\*'
+    comment: Math.random for randomness - use crypto.randomBytes instead

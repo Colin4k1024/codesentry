@@ -1,0 +1,18 @@
+id: SWIFT_COMMAND_INJECTION
+name: Command Injection
+description: Detects use of system or Process with user input that could allow command injection
+severity: SEVERE
+category: security
+languages:
+  - swift
+suggestion: Avoid shell commands with string interpolation, use Process with arguments array
+patterns:
+  - type: regex
+    pattern: 'system\s*\([^)]+\s*\+'
+    comment: system() with string concatenation - command injection risk
+  - type: regex
+    pattern: 'Process\s*\(\s*command\s*:\s*"[^"]+"\s*\+'
+    comment: Process with concatenated command - command injection risk
+  - type: regex
+    pattern: 'NSTask\.launchedTaskWithLaunchPath.*arguments'
+    comment: NSTask/Process launch path with user input - command injection risk

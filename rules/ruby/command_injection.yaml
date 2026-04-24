@@ -1,0 +1,20 @@
+id: RUBY_COMMAND_INJECTION
+name: Command Injection
+description: Detects use of system, exec, or open with user input that could allow command injection
+severity: SEVERE
+category: security
+languages: [ruby]
+suggestion: Avoid string interpolation in system/exec calls, use array form with separate arguments
+patterns:
+  - type: regex
+    pattern: 'system\s*\([^)]+\s*\+[^)]+\)'
+    comment: system with string concatenation
+  - type: regex
+    pattern: 'exec\s*\([^)]+\s*\+[^)]+\)'
+    comment: exec with string concatenation
+  - type: regex
+    pattern: '`[^`]*\{[^}]+\}`'
+    comment: Command via backtick interpolation
+  - type: regex
+    pattern: 'open\s*\([^)]+\s*\|\s*[^)]*\)'
+    comment: open with pipe and interpolation

@@ -1,0 +1,24 @@
+id: PY_SSRF
+name: Server-Side Request Forgery
+description: Detects use of requests library with user-controlled URLs that could allow SSRF attacks
+severity: SEVERE
+category: security
+languages:
+  - python
+suggestion: Validate and whitelist URLs before making requests, avoid direct user input in request URLs
+patterns:
+  - type: regex
+    pattern: 'requests\.(get|post|put|delete|patch)\s*\([^)]*\burl\s*=\s*[^)]+\+'
+    comment: SSRF risk - URL built with string concatenation
+  - type: regex
+    pattern: 'requests\.(get|post|put|delete|patch)\s*\([^,]+,\s*\{[^}]*:\s*[^)]+\+'
+    comment: SSRF risk - URL built with concatenation in params/data
+  - type: regex
+    pattern: 'urllib\.request\.urlopen\s*\([^)]+\+'
+    comment: SSRF risk - urllib urlopen with concatenation
+  - type: regex
+    pattern: 'httpx\.(get|post|put|delete|patch|Client)\s*\([^)]*\burl\s*=\s*[^)]+\+'
+    comment: SSRF risk - httpx URL built with concatenation
+  - type: regex
+    pattern: 'aiohttp\.ClientSession\.(get|post|put|delete|patch)\s*\([^)]+\+'
+    comment: SSRF risk - aiohttp URL built with concatenation

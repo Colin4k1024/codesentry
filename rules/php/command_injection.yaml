@@ -1,0 +1,30 @@
+id: PHP_COMMAND_INJECTION
+name: Command Injection
+description: Detects use of shell execution functions with user input that could allow command injection
+severity: SEVERE
+category: security
+languages:
+  - php
+suggestion: Avoid shell execution functions with user input, use exec with array arguments
+patterns:
+  - type: regex
+    pattern: 'shell_exec\s*\([^)]+\s*\.\s*[^)]+\)'
+    comment: shell_exec with string concatenation - command injection risk
+  - type: regex
+    pattern: '`[^`]*\$\{?[^}]+\}?`'
+    comment: Backtick execution with variable interpolation - command injection risk
+  - type: regex
+    pattern: 'passthru\s*\([^)]+\s*\.\s*[^)]+\)'
+    comment: passthru with concatenation - command injection risk
+  - type: regex
+    pattern: 'system\s*\([^)]+\s*\.\s*[^)]+\)'
+    comment: system() with concatenation - command injection risk
+  - type: regex
+    pattern: 'exec\s*\([^)]+\s*\.\s*[^)]+\)'
+    comment: exec() with concatenation - command injection risk
+  - type: regex
+    pattern: 'popen\s*\([^)]+\s*\.\s*[^)]+\)'
+    comment: popen with concatenation - command injection risk
+  - type: regex
+    pattern: 'proc_open\s*\([^)]+\s*\.\s*[^)]+\)'
+    comment: proc_open with concatenation - command injection risk

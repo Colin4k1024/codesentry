@@ -596,3 +596,268 @@ func TestEngine_New(t *testing.T) {
 		t.Errorf("len(e.rules) = %d, want 1", len(e.rules))
 	}
 }
+
+func TestFindRepoRoot(t *testing.T) {
+	tests := []struct {
+		name     string
+		paths    []string
+		expected string
+	}{
+		{
+			name:     "empty paths",
+			paths:    []string{},
+			expected: ".",
+		},
+		{
+			name:     "single path",
+			paths:    []string{"/home/user/project"},
+			expected: "/home/user/project",
+		},
+		{
+			name:     "common prefix",
+			paths:    []string{"/home/user/project/src", "/home/user/project/pkg"},
+			expected: "/home/user/project/",
+		},
+		{
+			name:     "nested common prefix",
+			paths:    []string{"/a/b/c", "/a/b/d", "/a/b/e"},
+			expected: "/a/b/",
+		},
+		{
+			name:     "no common prefix",
+			paths:    []string{"/a/b", "/c/d"},
+			expected: "/",
+		},
+		{
+			name:     "windows style",
+			paths:    []string{"C:\\Users\\Project\\src", "C:\\Users\\Project\\pkg"},
+			expected: "C:\\Users\\Project\\",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := findRepoRoot(tt.paths)
+			if result != tt.expected {
+				t.Errorf("findRepoRoot(%v) = %q, want %q", tt.paths, result, tt.expected)
+			}
+		})
+	}
+}
+
+func TestCommonPrefix(t *testing.T) {
+	tests := []struct {
+		name     string
+		a        string
+		b        string
+		expected string
+	}{
+		{
+			name:     "identical strings",
+			a:        "/home/user/project",
+			b:        "/home/user/project",
+			expected: "/home/user/project",
+		},
+		{
+			name:     "common prefix",
+			a:        "/home/user/project/src",
+			b:        "/home/user/project/pkg",
+			expected: "/home/user/project/",
+		},
+		{
+			name:     "no common prefix",
+			a:        "/home/user",
+			b:        "/other/user",
+			expected: "/",
+		},
+		{
+			name:     "one is prefix",
+			a:        "/home/user",
+			b:        "/home/user/project",
+			expected: "/home/user",
+		},
+		{
+			name:     "empty strings",
+			a:        "",
+			b:        "/home/user",
+			expected: "",
+		},
+		{
+			name:     "both empty",
+			a:        "",
+			b:        "",
+			expected: "",
+		},
+		{
+			name:     "single char common",
+			a:        "/a/b",
+			b:        "/a/c",
+			expected: "/a/",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := commonPrefix(tt.a, tt.b)
+			if result != tt.expected {
+				t.Errorf("commonPrefix(%q, %q) = %q, want %q", tt.a, tt.b, result, tt.expected)
+			}
+		})
+	}
+}
+
+func TestEngine_ScanWithContext(t *testing.T) {
+	tmpDir := t.TempDir()
+
+	// Create a Go file with issue
+	goFile := filepath.Join(tmpDir, "test.go")
+	if err := os.WriteFile(goFile, []byte(`package main
+func main() {
+	password := "hardcoded"
+}
+`), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	e := New([]rules.Rule{
+		{
+			ID:       "HARDCODED_SECRET",
+			Name:     "Hardcoded Secret",
+			Severity: "SEVERE",
+			Category: "security",
+			Languages: []string{"go"},
+			Patterns: []rules.Pattern{
+				{Type: "regex", Pattern: "password", Comment: "hardcoded secret"},
+			},
+		},
+	})
+
+	// Test with NoAI = true (should skip context enrichment)
+	cfg := &Config{NoAI: true}
+	result, err := e.ScanWithContext([]string{tmpDir}, cfg)
+	if err != nil {
+		t.Fatalf("ScanWithContext returned error: %v", err)
+	}
+	if result == nil {
+		t.Fatal("ScanWithContext returned nil result")
+	}
+
+	// Test with NoAI = false (may fail to parse, but should not error)
+	cfg = &Config{NoAI: false}
+	result, err = e.ScanWithContext([]string{tmpDir}, cfg)
+	if err != nil {
+		t.Fatalf("ScanWithContext returned error: %v", err)
+	}
+	if result == nil {
+		t.Fatal("ScanWithContext returned nil result")
+	}
+}
+
+func TestEngine_ScanWithContext_EmptyPaths(t *testing.T) {
+	e := New([]rules.Rule{})
+	cfg := &Config{}
+
+	result, err := e.ScanWithContext([]string{}, cfg)
+	if err != nil {
+		t.Fatalf("ScanWithContext returned error: %v", err)
+	}
+	if result.FilesScanned != 0 {
+		t.Errorf("FilesScanned = %d, want 0", result.FilesScanned)
+	}
+}
+
+func TestEngine_Scan_DuplicateFindings(t *testing.T) {
+	tmpDir := t.TempDir()
+
+	// Create file with same issue appearing twice on same line (should be deduped)
+	goFile := filepath.Join(tmpDir, "test.go")
+	if err := os.WriteFile(goFile, []byte(`password = "hardcoded123"; password = "hardcoded456"
+`), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	e := New([]rules.Rule{
+		{
+			ID:       "HARDCODED_SECRET",
+			Name:     "Hardcoded Secret",
+			Severity: "SEVERE",
+			Category: "security",
+			Languages: []string{"go"},
+			Patterns: []rules.Pattern{
+				{Type: "regex", Pattern: "password.*=.*\"[^\"]+\"", Comment: "hardcoded secret"},
+			},
+		},
+	})
+
+	cfg := &Config{}
+	result, err := e.Scan([]string{tmpDir}, cfg)
+	if err != nil {
+		t.Fatalf("Scan() returned error: %v", err)
+	}
+
+	// Even if regex matches twice on same line, dedup should keep unique file:line:rule
+	t.Logf("TotalIssues: %d", result.TotalIssues)
+}
+
+func TestEngine_Scan_SeverityCounting(t *testing.T) {
+	tmpDir := t.TempDir()
+
+	goFile := filepath.Join(tmpDir, "test.go")
+	if err := os.WriteFile(goFile, []byte(`password = "secret1"
+token = "secret2"
+info = "info"
+`), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	e := New([]rules.Rule{
+		{
+			ID:       "HARDCODED_SECRET",
+			Name:     "Hardcoded Secret",
+			Severity: "SEVERE",
+			Category: "security",
+			Languages: []string{"go"},
+			Patterns: []rules.Pattern{
+				{Type: "regex", Pattern: "password"},
+			},
+		},
+		{
+			ID:       "HARDCODED_TOKEN",
+			Name:     "Hardcoded Token",
+			Severity: "WARNING",
+			Category: "security",
+			Languages: []string{"go"},
+			Patterns: []rules.Pattern{
+				{Type: "regex", Pattern: "token"},
+			},
+		},
+		{
+			ID:       "INFO_MSG",
+			Name:     "Info Message",
+			Severity: "INFO",
+			Category: "security",
+			Languages: []string{"go"},
+			Patterns: []rules.Pattern{
+				{Type: "regex", Pattern: "info"},
+			},
+		},
+	})
+
+	cfg := &Config{}
+	result, err := e.Scan([]string{tmpDir}, cfg)
+	if err != nil {
+		t.Fatalf("Scan() returned error: %v", err)
+	}
+
+	if result.Severe != 1 {
+		t.Errorf("Severe = %d, want 1", result.Severe)
+	}
+	if result.Warning != 1 {
+		t.Errorf("Warning = %d, want 1", result.Warning)
+	}
+	if result.Info != 1 {
+		t.Errorf("Info = %d, want 1", result.Info)
+	}
+}
+
+

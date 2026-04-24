@@ -1,0 +1,23 @@
+id: TS_REGEX_DOS
+name: Regex Denial of Service
+description: Detects potentially vulnerable regex patterns that could cause catastrophic backtracking
+severity: WARNING
+category: security
+languages: [typescript, javascript]
+suggestion: Use atomic groups, possessive quantifiers, or simplify regex patterns to prevent ReDoS attacks
+patterns:
+  - type: regex
+    pattern: '\(\.\*\+\)\+'
+    comment: Nested quantifiers - catastrophic backtracking risk
+  - type: regex
+    pattern: '\(\.\+\+\)\+'
+    comment: Nested quantifiers - catastrophic backtracking risk
+  - type: regex
+    pattern: '\(\.\+\*\)\+'
+    comment: Nested quantifiers - catastrophic backtracking risk
+  - type: regex
+    pattern: '\(\.\*\.\*\)\+'
+    comment: Nested quantifiers - catastrophic backtracking risk
+  - type: regex
+    pattern: '\|.*\|.*\|'
+    comment: Alternation with overlapping patterns - potential backtracking

@@ -1,0 +1,20 @@
+id: CPP_INTEGER_OVERFLOW
+name: Integer Overflow
+description: Detects potentially unsafe integer arithmetic that could lead to overflow or underflow
+severity: WARNING
+category: security
+languages: [cpp]
+suggestion: Use safe integer types (int64_t) and check for overflow conditions
+patterns:
+  - type: regex
+    pattern: 'int\s+\w+\s*=\s*\w+\s*\*\s*\w+'
+    comment: Potential integer overflow in multiplication
+  - type: regex
+    pattern: 'unsigned\s+\w+\s*-\s*\w+'
+    comment: Potential unsigned underflow
+  - type: regex
+    pattern: 'malloc\s*\([^)]*\)\s*;'
+    comment: Potential buffer overflow - malloc without size check
+  - type: regex
+    pattern: 'new\s+char\s*\[\s*\w+\s*\+\s*\w+\s*\]'
+    comment: Potential overflow in buffer allocation

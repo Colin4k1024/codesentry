@@ -16,7 +16,9 @@ var (
 	securityFlag    bool
 	performanceFlag bool
 	noAIFlag        bool
+	noColorFlag     bool
 	outputFlag      string
+	formatFlag      string
 	excludeFlag     []string
 )
 
@@ -69,16 +71,24 @@ var scanCmd = &cobra.Command{
 		}
 		result.Duration = time.Since(start)
 
-		// Output results
-		if err := writeScanOutput(result); err != nil {
-			fmt.Fprintf(os.Stderr, "Error writing scan output: %v\n", err)
-			os.Exit(1)
+		// Set color mode: only override auto-detection if --no-color is passed
+		if noColorFlag {
+			output.SetColorEnabled(false)
+		}
+	// Output results
+		if outputFlag != "" || formatFlag != "" {
+			outFmt := output.FormatText
+			if formatFlag != "" {
+				outFmt = output.Format(formatFlag)
+			}
+			if err := output.Write(result, outFmt, outputFlag); err != nil {
+				fmt.Fprintf(os.Stderr, "Error writing output: %v\n", err)
+				os.Exit(1)
+			}
+		} else {
+			output.Write(result, output.FormatText, "")
 		}
 	},
-}
-
-func writeScanOutput(result *types.Result) error {
-	return output.Write(result, output.FormatForPath(outputFlag), outputFlag)
 }
 
 func init() {
@@ -86,6 +96,8 @@ func init() {
 	scanCmd.Flags().BoolVar(&securityFlag, "security", false, "Enable security rules")
 	scanCmd.Flags().BoolVar(&performanceFlag, "performance", false, "Enable performance rules")
 	scanCmd.Flags().BoolVar(&noAIFlag, "no-ai", false, "Disable AI-powered analysis")
+	scanCmd.Flags().BoolVar(&noColorFlag, "no-color", false, "Disable colored output")
 	scanCmd.Flags().StringVarP(&outputFlag, "output", "o", "", "Output file for results")
+	scanCmd.Flags().StringVar(&formatFlag, "format", "", "Output format: text, json, sarif, ghsl, clang")
 	scanCmd.Flags().StringArrayVar(&excludeFlag, "exclude", []string{}, "Paths to exclude from scanning")
 }

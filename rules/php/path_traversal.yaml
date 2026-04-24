@@ -1,0 +1,23 @@
+id: PHP_PATH_TRAVERSAL
+name: Path Traversal
+description: Detects file operations using unsanitized user input that could allow path traversal attacks
+severity: SEVERE
+category: security
+languages: [php]
+suggestion: Validate and sanitize file paths, use realpath and basename
+patterns:
+  - type: regex
+    pattern: 'include\s*\([^)]+\s*\+\s*[^)]+\)'
+    comment: Dynamic include with path concatenation
+  - type: regex
+    pattern: 'require\s*\([^)]+\s*\+\s*[^)]+\)'
+    comment: Dynamic require with path concatenation
+  - type: regex
+    pattern: 'file_get_contents\s*\([^)]+\s*\+\s*[^)]+\)'
+    comment: File path built via string concatenation
+  - type: regex
+    pattern: 'file_put_contents\s*\([^)]+\s*\+\s*[^)]+\)'
+    comment: File path built via string concatenation
+  - type: regex
+    pattern: 'fopen\s*\([^)]+\s*\+\s*[^)]+\)'
+    comment: fopen with concatenated path

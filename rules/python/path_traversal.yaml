@@ -1,0 +1,24 @@
+id: PY_PATH_TRAVERSAL
+name: Path Traversal
+description: Detects file operations using unsanitized user input that could allow path traversal attacks
+severity: SEVERE
+category: security
+languages:
+  - python
+suggestion: Validate and sanitize file paths, use os.path.basename to strip directory components
+patterns:
+  - type: regex
+    pattern: 'open\s*\([^)]+\s*\+\s*[^)]+\)'
+    comment: File path built via string concatenation - path traversal risk
+  - type: regex
+    pattern: 'os\.path\.join\s*\([^)]+\s*\+\s*[^)]+\)'
+    comment: Path constructed with user input via concatenation
+  - type: regex
+    pattern: ' pathlib\.[Pp]ath\s*\([^)]+\s*\+\s*[^)]+\)'
+    comment: Path built with string concatenation
+  - type: regex
+    pattern: '\.read_text\s*\([^)]+\s*\+\s*[^)]+\)'
+    comment: Path traversal risk in read_text
+  - type: regex
+    pattern: '\.write_text\s*\([^)]+\s*\+\s*[^)]+\)'
+    comment: Path traversal risk in write_text

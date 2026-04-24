@@ -26,3 +26,4 @@ coverage.html
 
 # Test
 testdata/rules/*.golden.json
+goreview
