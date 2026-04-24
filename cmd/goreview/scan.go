@@ -8,7 +8,6 @@ import (
 	"github.com/Colin4k1024/codesentry/internal/engine"
 	"github.com/Colin4k1024/codesentry/internal/output"
 	"github.com/Colin4k1024/codesentry/internal/rules"
-	"github.com/Colin4k1024/codesentry/internal/types"
 	"github.com/spf13/cobra"
 )
 
@@ -79,7 +78,7 @@ var scanCmd = &cobra.Command{
 		if outputFlag != "" || formatFlag != "" {
 			outFmt := output.FormatText
 			if formatFlag != "" {
-				outFmt = output.Format(formatFlag)
+				outFmt = output.ParseFormat(formatFlag)
 			}
 			if err := output.Write(result, outFmt, outputFlag); err != nil {
 				fmt.Fprintf(os.Stderr, "Error writing output: %v\n", err)

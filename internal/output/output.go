@@ -63,6 +63,22 @@ const (
 
 const toolVersion = "1.0.0"
 
+// ParseFormat converts a string to a Format type.
+func ParseFormat(s string) Format {
+	switch strings.ToLower(s) {
+	case "json":
+		return FormatJSON
+	case "sarif":
+		return FormatSarif
+	case "ghsl":
+		return FormatGHSL
+	case "clang":
+		return FormatCLang
+	default:
+		return FormatText
+	}
+}
+
 // FormatForPath infers the output format from a file path extension.
 func FormatForPath(outputPath string) Format {
 	switch strings.ToLower(filepath.Ext(outputPath)) {
@@ -70,6 +86,10 @@ func FormatForPath(outputPath string) Format {
 		return FormatJSON
 	case ".sarif":
 		return FormatSarif
+	case ".ghsl":
+		return FormatGHSL
+	case ".clang":
+		return FormatCLang
 	default:
 		return FormatText
 	}

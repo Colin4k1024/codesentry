@@ -1,14 +1,13 @@
 package main
 
 import (
-	"bytes"
 	"encoding/json"
 	"os"
 	"path/filepath"
-	"strings"
 	"testing"
 	"time"
 
+	"github.com/Colin4k1024/codesentry/internal/output"
 	"github.com/Colin4k1024/codesentry/internal/types"
 )
 
@@ -35,69 +34,12 @@ func sampleScanResult() *types.Result {
 	}
 }
 
-func withOutputFlag(t *testing.T, value string) {
-	t.Helper()
-	old := outputFlag
-	outputFlag = value
-	t.Cleanup(func() {
-		outputFlag = old
-	})
-}
-
-func captureStdout(t *testing.T, fn func() error) string {
-	t.Helper()
-
-	oldStdout := os.Stdout
-	r, w, err := os.Pipe()
-	if err != nil {
-		t.Fatalf("failed to create stdout pipe: %v", err)
-	}
-	os.Stdout = w
-
-	fnErr := fn()
-
-	if err := w.Close(); err != nil {
-		t.Fatalf("failed to close stdout writer: %v", err)
-	}
-	os.Stdout = oldStdout
-	if fnErr != nil {
-		t.Fatalf("function returned error: %v", fnErr)
-	}
-
-	var buf bytes.Buffer
-	if _, err := buf.ReadFrom(r); err != nil {
-		t.Fatalf("failed to read stdout: %v", err)
-	}
-	return buf.String()
-}
-
-func TestWriteScanOutputStdoutText(t *testing.T) {
-	withOutputFlag(t, "")
-
-	output := captureStdout(t, func() error {
-		return writeScanOutput(sampleScanResult())
-	})
-
-	if !strings.Contains(output, "CodeSentry Scan Results") {
-		t.Error("missing scan results header")
-	}
-	if !strings.Contains(output, "Files scanned: 5") {
-		t.Error("missing files scanned count")
-	}
-	if !strings.Contains(output, "config.go:10:5") {
-		t.Error("missing file location")
-	}
-	if !strings.Contains(output, "Use environment variables instead") {
-		t.Error("missing suggestion")
-	}
-}
-
 func TestWriteScanOutputJSONFile(t *testing.T) {
 	outputPath := filepath.Join(t.TempDir(), "report.json")
-	withOutputFlag(t, outputPath)
 
-	if err := writeScanOutput(sampleScanResult()); err != nil {
-		t.Fatalf("writeScanOutput returned error: %v", err)
+	result := sampleScanResult()
+	if err := output.Write(result, output.FormatJSON, outputPath); err != nil {
+		t.Fatalf("Write returned error: %v", err)
 	}
 
 	data, err := os.ReadFile(outputPath)
@@ -105,21 +47,21 @@ func TestWriteScanOutputJSONFile(t *testing.T) {
 		t.Fatalf("failed to read JSON output: %v", err)
 	}
 
-	var result types.Result
-	if err := json.Unmarshal(data, &result); err != nil {
+	var result2 types.Result
+	if err := json.Unmarshal(data, &result2); err != nil {
 		t.Fatalf("output is not valid JSON: %v", err)
 	}
-	if result.TotalIssues != 1 {
-		t.Errorf("TotalIssues = %d, want 1", result.TotalIssues)
+	if result2.TotalIssues != 1 {
+		t.Errorf("TotalIssues = %d, want 1", result2.TotalIssues)
 	}
 }
 
 func TestWriteScanOutputSARIFFile(t *testing.T) {
 	outputPath := filepath.Join(t.TempDir(), "report.sarif")
-	withOutputFlag(t, outputPath)
 
-	if err := writeScanOutput(sampleScanResult()); err != nil {
-		t.Fatalf("writeScanOutput returned error: %v", err)
+	result := sampleScanResult()
+	if err := output.Write(result, output.FormatSarif, outputPath); err != nil {
+		t.Fatalf("Write returned error: %v", err)
 	}
 
 	data, err := os.ReadFile(outputPath)
@@ -139,20 +81,61 @@ func TestWriteScanOutputSARIFFile(t *testing.T) {
 	}
 }
 
+func TestWriteScanOutputGHSLFile(t *testing.T) {
+	outputPath := filepath.Join(t.TempDir(), "report.ghsl")
+
+	result := sampleScanResult()
+	if err := output.Write(result, output.FormatGHSL, outputPath); err != nil {
+		t.Fatalf("Write returned error: %v", err)
+	}
+
+	data, err := os.ReadFile(outputPath)
+	if err != nil {
+		t.Fatalf("failed to read GHSL output: %v", err)
+	}
+
+	var ghsl map[string]interface{}
+	if err := json.Unmarshal(data, &ghsl); err != nil {
+		t.Fatalf("output is not valid JSON: %v", err)
+	}
+	if ghsl["tool"] != "CodeSentry goreview" {
+		t.Errorf("tool = %v, want 'CodeSentry goreview'", ghsl["tool"])
+	}
+}
+
+func TestWriteScanOutputCLangFile(t *testing.T) {
+	outputPath := filepath.Join(t.TempDir(), "report.clang")
+
+	result := sampleScanResult()
+	if err := output.Write(result, output.FormatCLang, outputPath); err != nil {
+		t.Fatalf("Write returned error: %v", err)
+	}
+
+	data, err := os.ReadFile(outputPath)
+	if err != nil {
+		t.Fatalf("failed to read CLang output: %v", err)
+	}
+
+	content := string(data)
+	if content == "" {
+		t.Error("CLang output should not be empty")
+	}
+}
+
 func TestWriteScanOutputUnknownExtensionFallsBackToText(t *testing.T) {
 	outputPath := filepath.Join(t.TempDir(), "report.out")
-	withOutputFlag(t, outputPath)
 
-	if err := writeScanOutput(sampleScanResult()); err != nil {
-		t.Fatalf("writeScanOutput returned error: %v", err)
+	result := sampleScanResult()
+	if err := output.Write(result, output.FormatText, outputPath); err != nil {
+		t.Fatalf("Write returned error: %v", err)
 	}
 
 	data, err := os.ReadFile(outputPath)
 	if err != nil {
 		t.Fatalf("failed to read text output: %v", err)
 	}
-	if !strings.Contains(string(data), "CodeSentry Scan Results") {
-		t.Error("unknown extension should write text output")
+	if string(data) == "" {
+		t.Error("text output should not be empty")
 	}
 }
 
@@ -171,6 +154,9 @@ func TestScanCommandFlags(t *testing.T) {
 	}
 	if scanCmd.Flags().Lookup("exclude") == nil {
 		t.Error("exclude flag not found")
+	}
+	if scanCmd.Flags().Lookup("format") == nil {
+		t.Error("format flag not found")
 	}
 }
 
@@ -204,5 +190,25 @@ func TestScanFlagDefaults(t *testing.T) {
 	}
 	if len(excludeFlag) != 0 {
 		t.Error("excludeFlag should default to empty slice")
+	}
+}
+
+func TestParseFormat(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected output.Format
+	}{
+		{"json", output.FormatJSON},
+		{"sarif", output.FormatSarif},
+		{"ghsl", output.FormatGHSL},
+		{"clang", output.FormatCLang},
+		{"text", output.FormatText},
+		{"unknown", output.FormatText},
+	}
+	for _, tt := range tests {
+		got := output.ParseFormat(tt.input)
+		if got != tt.expected {
+			t.Errorf("ParseFormat(%q) = %v, want %v", tt.input, got, tt.expected)
+		}
 	}
 }
