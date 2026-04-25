@@ -30,6 +30,7 @@ jobs:
 
       - name: Check formatting
         run: |
+          gofmt -w $(git ls-files '*.go' ':!:testdata/**')
           unformatted="$(gofmt -l $(git ls-files '*.go' ':!:testdata/**'))"
           if [ -n "$unformatted" ]; then
             echo "Unformatted files:"
