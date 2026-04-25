@@ -85,7 +85,10 @@ var scanCmd = &cobra.Command{
 				os.Exit(1)
 			}
 		} else {
-			output.Write(result, output.FormatText, "")
+			if err := output.Write(result, output.FormatText, ""); err != nil {
+				fmt.Fprintf(os.Stderr, "Error writing output: %v\n", err)
+				os.Exit(1)
+			}
 		}
 	},
 }

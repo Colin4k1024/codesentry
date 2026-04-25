@@ -25,7 +25,9 @@ type GoldenFinding struct {
 	Message  string `json:"message"`
 }
 
-// loadGoldenFile loads a golden file from testdata/rules/
+// loadGoldenFile loads a golden file from testdata/rules.
+//
+//nolint:unused // kept for future golden file testing
 func loadGoldenFile(t *testing.T, ruleID string) *GoldenFile {
 	t.Helper()
 

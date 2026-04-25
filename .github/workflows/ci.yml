@@ -105,7 +105,7 @@ jobs:
           severity: 'MEDIUM,HIGH,CRITICAL'
 
       - name: Upload Trivy results to GitHub Security
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         if: always()
         with:
           sarif_file: 'trivy-results.sarif'
@@ -171,7 +171,7 @@ jobs:
             -o codesentry-results.sarif
 
       - name: Upload CodeSentry scan to GitHub Security
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         if: always()
         with:
           sarif_file: 'codesentry-results.sarif'

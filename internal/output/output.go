@@ -220,7 +220,7 @@ func formatSarif(result *types.Result) ([]byte, error) {
 				"name":             issue.Title,
 				"shortDescription": map[string]interface{}{"text": issue.Title},
 				"fullDescription":  map[string]interface{}{"text": issue.Message},
-				"defaultLevel":     mapSeverityToSarifLevel(issue.Severity),
+				"properties":       map[string]interface{}{"severity": issue.Severity},
 			}
 		}
 
