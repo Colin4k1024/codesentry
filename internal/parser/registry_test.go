@@ -11,8 +11,8 @@ type mockParser struct {
 	exts []string
 }
 
-func (m *mockParser) Language() string              { return m.lang }
-func (m *mockParser) Extensions() []string         { return m.exts }
+func (m *mockParser) Language() string     { return m.lang }
+func (m *mockParser) Extensions() []string { return m.exts }
 func (m *mockParser) Parse(filePath string, content []byte, langRules []rules.Rule) ([]Finding, error) {
 	return nil, nil
 }

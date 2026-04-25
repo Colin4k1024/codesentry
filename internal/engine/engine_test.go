@@ -721,10 +721,10 @@ func main() {
 
 	e := New([]rules.Rule{
 		{
-			ID:       "HARDCODED_SECRET",
-			Name:     "Hardcoded Secret",
-			Severity: "SEVERE",
-			Category: "security",
+			ID:        "HARDCODED_SECRET",
+			Name:      "Hardcoded Secret",
+			Severity:  "SEVERE",
+			Category:  "security",
 			Languages: []string{"go"},
 			Patterns: []rules.Pattern{
 				{Type: "regex", Pattern: "password", Comment: "hardcoded secret"},
@@ -778,10 +778,10 @@ func TestEngine_Scan_DuplicateFindings(t *testing.T) {
 
 	e := New([]rules.Rule{
 		{
-			ID:       "HARDCODED_SECRET",
-			Name:     "Hardcoded Secret",
-			Severity: "SEVERE",
-			Category: "security",
+			ID:        "HARDCODED_SECRET",
+			Name:      "Hardcoded Secret",
+			Severity:  "SEVERE",
+			Category:  "security",
 			Languages: []string{"go"},
 			Patterns: []rules.Pattern{
 				{Type: "regex", Pattern: "password.*=.*\"[^\"]+\"", Comment: "hardcoded secret"},
@@ -812,30 +812,30 @@ info = "info"
 
 	e := New([]rules.Rule{
 		{
-			ID:       "HARDCODED_SECRET",
-			Name:     "Hardcoded Secret",
-			Severity: "SEVERE",
-			Category: "security",
+			ID:        "HARDCODED_SECRET",
+			Name:      "Hardcoded Secret",
+			Severity:  "SEVERE",
+			Category:  "security",
 			Languages: []string{"go"},
 			Patterns: []rules.Pattern{
 				{Type: "regex", Pattern: "password"},
 			},
 		},
 		{
-			ID:       "HARDCODED_TOKEN",
-			Name:     "Hardcoded Token",
-			Severity: "WARNING",
-			Category: "security",
+			ID:        "HARDCODED_TOKEN",
+			Name:      "Hardcoded Token",
+			Severity:  "WARNING",
+			Category:  "security",
 			Languages: []string{"go"},
 			Patterns: []rules.Pattern{
 				{Type: "regex", Pattern: "token"},
 			},
 		},
 		{
-			ID:       "INFO_MSG",
-			Name:     "Info Message",
-			Severity: "INFO",
-			Category: "security",
+			ID:        "INFO_MSG",
+			Name:      "Info Message",
+			Severity:  "INFO",
+			Category:  "security",
 			Languages: []string{"go"},
 			Patterns: []rules.Pattern{
 				{Type: "regex", Pattern: "info"},
@@ -859,5 +859,3 @@ info = "info"
 		t.Errorf("Info = %d, want 1", result.Info)
 	}
 }
-
-

@@ -304,10 +304,10 @@ func formatGHSL(result *types.Result) ([]byte, error) {
 		alerts = append(alerts, a)
 	}
 	return json.MarshalIndent(map[string]interface{}{
-		"tool":       "CodeSentry goreview",
-		"version":    "1.0.0",
+		"tool":         "CodeSentry goreview",
+		"version":      "1.0.0",
 		"filesScanned": result.FilesScanned,
-		"totalIssues": result.TotalIssues,
+		"totalIssues":  result.TotalIssues,
 		"summary": map[string]int{
 			"severe":  result.Severe,
 			"warning": result.Warning,

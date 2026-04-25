@@ -74,7 +74,7 @@ var scanCmd = &cobra.Command{
 		if noColorFlag {
 			output.SetColorEnabled(false)
 		}
-	// Output results
+		// Output results
 		if outputFlag != "" || formatFlag != "" {
 			outFmt := output.FormatText
 			if formatFlag != "" {
