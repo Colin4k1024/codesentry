@@ -62,6 +62,7 @@ jobs:
         if: matrix.os == 'windows-latest'
         shell: bash
         run: |
+          go build -o goreview.exe ./cmd/goreview
           ./goreview.exe scan . --security --no-ai \
             --exclude _test.go \
             --exclude testdata \
