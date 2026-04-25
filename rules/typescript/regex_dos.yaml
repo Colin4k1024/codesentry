@@ -19,5 +19,5 @@ patterns:
     pattern: '\(\.\*\.\*\)\+'
     comment: Nested quantifiers - catastrophic backtracking risk
   - type: regex
-    pattern: '\|.*\|.*\|'
-    comment: Alternation with overlapping patterns - potential backtracking
+    pattern: '\|[^| ]+\|[^| ]+\|[^| ]+'
+    comment: Alternation with 3+ pipes inside regex literals - use atomic groups or simplify to prevent ReDoS

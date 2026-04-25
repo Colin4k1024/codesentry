@@ -7,5 +7,5 @@ languages: [go, javascript, python]
 suggestion: Use parameterized queries instead of string formatting for SQL queries
 patterns:
   - type: regex
-    pattern: '(SELECT|INSERT|UPDATE|DELETE).*\+'
-    comment: String concatenation in SQL query
+    pattern: '(SELECT|INSERT|UPDATE|DELETE|FROM|WHERE).*\+\s*["\x27]'
+    comment: String concatenation in SQL query - ensure parameterized queries are used

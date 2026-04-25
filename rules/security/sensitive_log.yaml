@@ -7,5 +7,5 @@ languages: [go, javascript, python]
 suggestion: Remove sensitive fields from log statements
 patterns:
   - type: regex
-    pattern: '(log\.|console\.|fmt\.Print|print\().*(password|token|secret|key)'
+    pattern: '(log\.|console\.|fmt\.Print|print\()(.)*\b(password|token|secret)\b'
     comment: Possible sensitive data in log
