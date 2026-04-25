@@ -7,11 +7,10 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"syscall"
 	"text/tabwriter"
-	"unsafe"
 
 	"github.com/Colin4k1024/codesentry/internal/types"
+	"golang.org/x/term"
 )
 
 // Format output format type
@@ -39,18 +38,8 @@ func SetColorEnabled(enabled bool) {
 
 // isTTY 检测输出是否连接到终端
 func isTTY() bool {
-	return isTerminal(os.Stdout.Fd())
+	return term.IsTerminal(int(os.Stdout.Fd()))
 }
-
-// isTerminal 使用系统调用检测文件描述符是否为终端
-func isTerminal(fd uintptr) bool {
-	var termios syscall.Termios
-	_, _, err := syscall.Syscall6(syscall.SYS_IOCTL, fd, ioctlReadTermios, uintptr(unsafe.Pointer(&termios)), 0, 0, 0)
-	return err == 0
-}
-
-// ioctlReadTermios 是 TIOCGETA 的值
-const ioctlReadTermios = 0x402C7413
 
 const (
 	colorRed    = "\033[31m"
