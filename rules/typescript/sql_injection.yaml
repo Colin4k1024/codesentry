@@ -9,11 +9,14 @@ languages:
 suggestion: Use parameterized queries or an ORM
 patterns:
   - type: regex
-    pattern: '(?i)(query|execute|run)\s*\([^)]*\+[^)]*\)'
-    comment: String concatenation in SQL query
+    pattern: "(?i)(query|execute|run)\\s*\\([^)]*(\"|').*SELECT.*(\"|')\\s*\\+"
+    comment: SQL query with string concatenation - potential injection
   - type: regex
-    pattern: '(?i)`[^`]*\$\{[^}]*\+[^}]*\}[^`]*`'
+    pattern: "(?i)(\"|').*(SELECT|INSERT|UPDATE|DELETE).*(\"|')\\s*\\+"
+    comment: SQL keyword string concatenated with variable - potential injection
+  - type: regex
+    pattern: '(?i)(SELECT|INSERT|UPDATE|DELETE|FROM|WHERE|ORDER|GROUP|HAVING|LIMIT|JOIN)\s*`[^`]*\$\{[^}]*\+[^}]*\}[^`]*`'
     comment: String concatenation in template literal SQL query
   - type: regex
-    pattern: '(?i)template\s*`[^`]*SELECT[^`]*\$\{'
-    comment: Template literal in SQL query - verify parameterized
+    pattern: 'template\s+`[^`]*SELECT[^`]*\$\{.*\}.*`'
+    comment: Template literal with SELECT and interpolation

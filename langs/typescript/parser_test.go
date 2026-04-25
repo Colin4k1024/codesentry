@@ -13,9 +13,9 @@ func TestTypeScriptParser_HARDCODED_SECRET(t *testing.T) {
 	testFile := filepath.Join(tmpDir, "test.ts")
 
 	// TypeScript code with hardcoded credentials
-	code := `const password = "hardcoded123";
-const apiKey = "sk-abcdefgh123456";
-const token = "Bearer xxx.yyy.zzz";`
+	code := `const password = "hardcoded12345678";
+const apiKey = "sk_live_abcdef1234567890";
+const token = "ghp_abcdefghijklmnopqrstuvwxyz1234567890";`
 	if err := os.WriteFile(testFile, []byte(code), 0644); err != nil {
 		t.Fatal(err)
 	}

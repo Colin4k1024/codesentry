@@ -53,7 +53,7 @@ func (e *Engine) Scan(paths []string, cfg *Config) (*types.Result, error) {
 				return err
 			}
 			if info.IsDir() {
-				if info.Name() == "node_modules" || info.Name() == ".git" || info.Name() == "vendor" {
+				if info.Name() == "node_modules" || info.Name() == ".git" || info.Name() == "vendor" || info.Name() == "target" || info.Name() == "_deps" || info.Name() == ".venv" || info.Name() == "venv" || info.Name() == ".vitepress" {
 					return filepath.SkipDir
 				}
 				return nil

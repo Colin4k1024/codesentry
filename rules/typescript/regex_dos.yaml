@@ -7,17 +7,16 @@ languages: [typescript, javascript]
 suggestion: Use atomic groups, possessive quantifiers, or simplify regex patterns to prevent ReDoS attacks
 patterns:
   - type: regex
-    pattern: '\(\.\*\+\)\+'
-    comment: Nested quantifiers - catastrophic backtracking risk
+    # Match nested quantifiers inside regex literals - patterns like (.*+)+, (.++)+, (.+*)+, (.*.*)+
+    # Only matches inside /.../ regex literals to avoid false positives on array indexing like str[0]
+    pattern: '/[^/]*\(\.[*+]+\)[*+]+/'
+    comment: Nested quantifiers inside regex literal - catastrophic backtracking risk
   - type: regex
-    pattern: '\(\.\+\+\)\+'
-    comment: Nested quantifiers - catastrophic backtracking risk
+    # Match nested quantifiers with alternation inside regex literals
+    pattern: '/[^/]*\(\.[^)]+\)[*+]+/'
+    comment: Nested quantifiers inside regex literal - catastrophic backtracking risk
   - type: regex
-    pattern: '\(\.\+\*\)\+'
-    comment: Nested quantifiers - catastrophic backtracking risk
-  - type: regex
-    pattern: '\(\.\*\.\*\)\+'
-    comment: Nested quantifiers - catastrophic backtracking risk
-  - type: regex
-    pattern: '\|.*\|.*\|'
-    comment: Alternation with overlapping patterns - potential backtracking
+    # Match alternation with 3+ pipes inside regex literals (not logical OR operators)
+    # Requires being inside a regex literal context (preceded by / and followed by /)
+    pattern: '/[^/]*\|[^|]+\|[^|]+\|[^/]+/'
+    comment: Alternation with 3+ pipes inside regex literal - use atomic groups or simplify to prevent ReDoS

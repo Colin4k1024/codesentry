@@ -166,6 +166,286 @@ func query() {
 	}
 }
 
+func TestGoParser_SQL_INJECTION_Parameterized(t *testing.T) {
+	tmpDir := t.TempDir()
+	testFile := filepath.Join(tmpDir, "test.go")
+
+	// Go code with SAFE parameterized query - should NOT trigger
+	code := `package main
+
+import "database/sql"
+
+func query() {
+	db, _ := sql.Open("postgres", "connection_string")
+	rows, _ := db.Query("SELECT * FROM users WHERE id = $1", userID)
+}
+`
+	if err := os.WriteFile(testFile, []byte(code), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	content, err := os.ReadFile(testFile)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	rulesDir := filepath.Join("..", "..", "rules")
+	allRules := rules.LoadRules(rulesDir)
+	var goRules []rules.Rule
+	for _, r := range allRules {
+		if r.ID == "SQL_INJECTION" {
+			goRules = append(goRules, r)
+		}
+	}
+
+	if len(goRules) == 0 {
+		t.Fatal("SQL_INJECTION rule not found")
+	}
+
+	parser := &GoParser{}
+	findings, err := parser.Parse(testFile, content, goRules)
+	if err != nil {
+		t.Fatalf("Parse returned error: %v", err)
+	}
+
+	// Should NOT find any SQL injection for parameterized queries
+	for _, f := range findings {
+		if f.RuleID == "SQL_INJECTION" {
+			t.Error("expected NO SQL_INJECTION for parameterized query")
+		}
+	}
+}
+
+func TestGoParser_SQL_INJECTION_Concat(t *testing.T) {
+	tmpDir := t.TempDir()
+	testFile := filepath.Join(tmpDir, "test.go")
+
+	// Go code with UNSAFE string concatenation - should trigger
+	code := `package main
+
+import "database/sql"
+
+func query() {
+	db, _ := sql.Open("postgres", "connection_string")
+	rows, _ := db.Query("SELECT * FROM users WHERE id = " + userID)
+}
+`
+	if err := os.WriteFile(testFile, []byte(code), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	content, err := os.ReadFile(testFile)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	rulesDir := filepath.Join("..", "..", "rules")
+	allRules := rules.LoadRules(rulesDir)
+	var goRules []rules.Rule
+	for _, r := range allRules {
+		if r.ID == "SQL_INJECTION" {
+			goRules = append(goRules, r)
+		}
+	}
+
+	if len(goRules) == 0 {
+		t.Fatal("SQL_INJECTION rule not found")
+	}
+
+	parser := &GoParser{}
+	findings, err := parser.Parse(testFile, content, goRules)
+	if err != nil {
+		t.Fatalf("Parse returned error: %v", err)
+	}
+
+	// Should find SQL injection
+	found := false
+	for _, f := range findings {
+		if f.RuleID == "SQL_INJECTION" {
+			found = true
+			break
+		}
+	}
+	if !found {
+		t.Error("expected SQL_INJECTION finding for string concatenation")
+	}
+}
+
+func TestGoParser_SQL_INJECTION_Format(t *testing.T) {
+	tmpDir := t.TempDir()
+	testFile := filepath.Join(tmpDir, "test.go")
+
+	// Go code with UNSAFE fmt.Sprintf - should trigger
+	code := `package main
+
+import (
+	"database/sql"
+	"fmt"
+)
+
+func query() {
+	db, _ := sql.Open("postgres", "connection_string")
+	rows, _ := db.Query(fmt.Sprintf("SELECT * FROM users WHERE id = %s", userID))
+}
+`
+	if err := os.WriteFile(testFile, []byte(code), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	content, err := os.ReadFile(testFile)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	rulesDir := filepath.Join("..", "..", "rules")
+	allRules := rules.LoadRules(rulesDir)
+	var goRules []rules.Rule
+	for _, r := range allRules {
+		if r.ID == "SQL_INJECTION" {
+			goRules = append(goRules, r)
+		}
+	}
+
+	if len(goRules) == 0 {
+		t.Fatal("SQL_INJECTION rule not found")
+	}
+
+	parser := &GoParser{}
+	findings, err := parser.Parse(testFile, content, goRules)
+	if err != nil {
+		t.Fatalf("Parse returned error: %v", err)
+	}
+
+	// Should find SQL injection
+	found := false
+	for _, f := range findings {
+		if f.RuleID == "SQL_INJECTION" {
+			found = true
+			break
+		}
+	}
+	if !found {
+		t.Error("expected SQL_INJECTION finding for fmt.Sprintf")
+	}
+}
+
+func TestGoParser_ChainedSelectorQueryRow(t *testing.T) {
+	tmpDir := t.TempDir()
+	testFile := filepath.Join(tmpDir, "test.go")
+
+	// Go code with s.pool.QueryRow - chained selector with string concat
+	code := `package main
+
+import "database/sql"
+
+type Storage struct {
+	pool *sql.DB
+}
+
+func (s *Storage) query() {
+	row := s.pool.QueryRow("SELECT * FROM users WHERE id = " + userID)
+}
+`
+	if err := os.WriteFile(testFile, []byte(code), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	content, err := os.ReadFile(testFile)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	rulesDir := filepath.Join("..", "..", "rules")
+	allRules := rules.LoadRules(rulesDir)
+	var goRules []rules.Rule
+	for _, r := range allRules {
+		if r.ID == "SQL_INJECTION" {
+			goRules = append(goRules, r)
+		}
+	}
+
+	if len(goRules) == 0 {
+		t.Fatal("SQL_INJECTION rule not found")
+	}
+
+	parser := &GoParser{}
+	findings, err := parser.Parse(testFile, content, goRules)
+	if err != nil {
+		t.Fatalf("Parse returned error: %v", err)
+	}
+
+	// Should find SQL injection (string concatenation via parameter)
+	found := false
+	for _, f := range findings {
+		if f.RuleID == "SQL_INJECTION" {
+			found = true
+			break
+		}
+	}
+	if !found {
+		t.Error("expected SQL_INJECTION finding for s.pool.QueryRow with string concat")
+	}
+}
+
+func TestGoParser_ChainedSelectorQueryContext(t *testing.T) {
+	tmpDir := t.TempDir()
+	testFile := filepath.Join(tmpDir, "test.go")
+
+	// Go code with s.db.QueryContext - chained selector with context method
+	code := `package main
+
+import "context"
+import "database/sql"
+
+type Storage struct {
+	db *sql.DB
+}
+
+func (s *Storage) query() {
+	row := s.db.QueryContext(context.Background(), "SELECT * FROM users WHERE id = " + userID)
+}
+`
+	if err := os.WriteFile(testFile, []byte(code), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	content, err := os.ReadFile(testFile)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	rulesDir := filepath.Join("..", "..", "rules")
+	allRules := rules.LoadRules(rulesDir)
+	var goRules []rules.Rule
+	for _, r := range allRules {
+		if r.ID == "SQL_INJECTION" {
+			goRules = append(goRules, r)
+		}
+	}
+
+	if len(goRules) == 0 {
+		t.Fatal("SQL_INJECTION rule not found")
+	}
+
+	parser := &GoParser{}
+	findings, err := parser.Parse(testFile, content, goRules)
+	if err != nil {
+		t.Fatalf("Parse returned error: %v", err)
+	}
+
+	// Should find SQL injection (string concatenation via parameter)
+	found := false
+	for _, f := range findings {
+		if f.RuleID == "SQL_INJECTION" {
+			found = true
+			break
+		}
+	}
+	if !found {
+		t.Error("expected SQL_INJECTION finding for s.db.QueryContext with string concat")
+	}
+}
+
 func TestGoParser_Extensions(t *testing.T) {
 	parser := &GoParser{}
 	exts := parser.Extensions()

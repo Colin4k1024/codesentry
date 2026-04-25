@@ -9,8 +9,11 @@ languages:
 suggestion: Remove sensitive fields from log statements
 patterns:
   - type: regex
-    pattern: '(?i)(console|logger)\.(log|debug|info|warn|error)\([^)]*(password|token|secret|key|auth)[^)]*\)'
+    pattern: '(?i)(console|logger)\.(log|debug|info|warn|error)\([^)]*(password|token|secret)[^)]*\)'
     comment: Possible sensitive data in log
+  - type: regex
+    pattern: '(?i)(console|logger)\.(log|debug|info|warn|error)\([^)]*(api[_\s]?key|secret[_\s]?key|access[_\s]?token|bearer[_\s]?token)[^)]*\)'
+    comment: Possible API key or token in log
   - type: regex
     pattern: '(?i)process\.env\.\w+\s*\+\s*["\x27]'
     comment: Environment variable concatenated in string

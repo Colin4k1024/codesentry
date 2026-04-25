@@ -8,8 +8,8 @@ languages:
 suggestion: Remove sensitive fields from log statements
 patterns:
   - type: regex
-    pattern: '(?i)println!\s*\([^)]*(password|token|secret|key)'
+    pattern: '(?i)println!\s*\([^)]*(password|token|secret)\b'
     comment: Possible sensitive data in println
   - type: regex
-    pattern: '(?i)log::(debug|info|warn|error)!([^)]*(password|token|secret|key))'
+    pattern: '(?i)log::(debug|info|warn|error)!([^)]*(password|token|secret)\b)'
     comment: Possible sensitive data in log macro

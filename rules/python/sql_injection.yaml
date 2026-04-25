@@ -8,14 +8,11 @@ languages:
 suggestion: Use parameterized queries instead of string formatting
 patterns:
   - type: regex
-    pattern: '(?i)(execute|executemany|cursor\.execute)\s*\([^)]*\+[^)]*\)'
-    comment: String concatenation in SQL query
+    pattern: '(?i)(execute|executemany|cursor\.execute)\s*\([^)]*(\+|%|\.format\()[^)]*\)'
+    comment: String concatenation or formatting in SQL query - use parameterized queries
   - type: regex
-    pattern: '(?i)(execute|executemany|cursor\.execute)\s*%\s*\('
-    comment: String formatting in SQL query
+    pattern: '(?i)f["\x27].*\{.*\}.*SELECT'
+    comment: f-string with SQL keyword - verify values are sanitized
   - type: regex
-    pattern: '(?i)(execute|executemany|cursor\.execute)\s*\.format\('
-    comment: String .format() in SQL query
-  - type: regex
-    pattern: '(?i)f["\x27].*SELECT.*\{'
-    comment: f-string in SQL query
+    pattern: '(?i)execute\s*\([^)]*SELECT[^)]*\+[^)]*\)'
+    comment: SELECT with string concatenation in execute call
