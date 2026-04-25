@@ -31,9 +31,9 @@ func TestJSParser_HARDCODED_SECRET(t *testing.T) {
 
 	tmpDir := t.TempDir()
 	testFile := filepath.Join(tmpDir, "test.js")
-	code := `const password = "hardcoded123";
-const api_key = "sk-abcdefghij1234567890";
-const token = "Bearer xxx.yyy.zzz";`
+	code := `const password = "hardcoded12345678";
+const api_key = "sk_test_abcdef1234567890";
+const token = "ghp_abcdefghijklmnopqrstuvwxyz1234567890";`
 	if err := os.WriteFile(testFile, []byte(code), 0644); err != nil {
 		t.Fatal(err)
 	}

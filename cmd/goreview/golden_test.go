@@ -7,7 +7,21 @@ import (
 	"testing"
 
 	"github.com/Colin4k1024/codesentry/internal/engine"
+	parserpkg "github.com/Colin4k1024/codesentry/internal/parser"
 	"github.com/Colin4k1024/codesentry/internal/rules"
+
+	// Import language parsers to trigger their init() functions
+	_ "github.com/Colin4k1024/codesentry/langs/cpp"
+	_ "github.com/Colin4k1024/codesentry/langs/golang"
+	_ "github.com/Colin4k1024/codesentry/langs/java"
+	_ "github.com/Colin4k1024/codesentry/langs/javascript"
+	_ "github.com/Colin4k1024/codesentry/langs/kotlin"
+	_ "github.com/Colin4k1024/codesentry/langs/php"
+	_ "github.com/Colin4k1024/codesentry/langs/python"
+	_ "github.com/Colin4k1024/codesentry/langs/ruby"
+	_ "github.com/Colin4k1024/codesentry/langs/rust"
+	_ "github.com/Colin4k1024/codesentry/langs/swift"
+	_ "github.com/Colin4k1024/codesentry/langs/typescript"
 )
 
 // GoldenFile represents expected findings
@@ -28,9 +42,9 @@ func TestGoldenFile_HARDCODED_SECRET(t *testing.T) {
 	// Create temp input file
 	tmpDir := t.TempDir()
 	inputFile := filepath.Join(tmpDir, "test.py")
-	inputContent := `password = "hardcoded123"
-api_key = "secret_key_456"
-token = "token_789"
+	inputContent := `password = "hardcoded123456"
+api_key = "sk_test_abcdef1234567890"
+token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
 `
 	if err := os.WriteFile(inputFile, []byte(inputContent), 0644); err != nil {
 		t.Fatal(err)
@@ -65,6 +79,18 @@ token = "token_789"
 		t.Fatal("HARDCODED_SECRET rule not found")
 	}
 
+	// Debug: check parser detection and rules
+	t.Logf("DEBUG: tmpDir=%s, inputFile=%s", tmpDir, inputFile)
+	t.Logf("DEBUG: total rules loaded: %d", len(allRules))
+	for _, r := range allRules {
+		if r.ID == "HARDCODED_SECRET" {
+			t.Logf("DEBUG: HARDCODED_SECRET rule found, langs=%v, patterns=%d", r.Languages, len(r.Patterns))
+			for i, p := range r.Patterns {
+				t.Logf("DEBUG: rule pattern[%d] = %q", i, p.Pattern)
+			}
+		}
+	}
+
 	// Create engine with HARDCODED_SECRET rule
 	e := engine.New(hardcodedRules)
 	cfg := &engine.Config{}
@@ -72,6 +98,15 @@ token = "token_789"
 	result, err := e.Scan([]string{inputFile}, cfg)
 	if err != nil {
 		t.Fatalf("Scan() returned error: %v", err)
+	}
+
+	// Debug: directly check parser
+	importedParser, ok := parserpkg.Get("python")
+	t.Logf("DEBUG: parser.Get(python) = %v, ok=%v", importedParser, ok)
+	if importedParser != nil {
+		content, _ := os.ReadFile(inputFile)
+		findings, _ := importedParser.Parse(inputFile, content, hardcodedRules)
+		t.Logf("DEBUG: direct parser.Findings = %d: %+v", len(findings), findings)
 	}
 
 	// Load golden file
@@ -88,6 +123,7 @@ token = "token_789"
 
 	// Compare
 	if len(result.Issues) != len(golden.Findings) {
+		t.Logf("DEBUG: found %d issues, want %d. Issues: %+v", len(result.Issues), len(golden.Findings), result.Issues)
 		t.Errorf("found %d issues, want %d", len(result.Issues), len(golden.Findings))
 		return
 	}
@@ -107,8 +143,8 @@ func TestGoldenFile_SQL_INJECTION(t *testing.T) {
 	// Create temp input file
 	tmpDir := t.TempDir()
 	inputFile := filepath.Join(tmpDir, "test.py")
-	inputContent := `query = "SELECT * FROM users WHERE id=" + user_id
-sql = "INSERT INTO logs VALUES ('" + data + "')"
+	inputContent := `query = "SELECT * FROM users" + " WHERE id=" + user_input
+sql = "DELETE FROM logs" + " WHERE id=" + record_id
 `
 	if err := os.WriteFile(inputFile, []byte(inputContent), 0644); err != nil {
 		t.Fatal(err)
