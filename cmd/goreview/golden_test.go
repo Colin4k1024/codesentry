@@ -85,9 +85,6 @@ token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
 	for _, r := range allRules {
 		if r.ID == "HARDCODED_SECRET" {
 			t.Logf("DEBUG: HARDCODED_SECRET rule found, langs=%v, patterns=%d", r.Languages, len(r.Patterns))
-			for i, p := range r.Patterns {
-				t.Logf("DEBUG: rule pattern[%d] = %q", i, p.Pattern)
-			}
 		}
 	}
 

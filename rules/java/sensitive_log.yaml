@@ -8,8 +8,11 @@ languages:
 suggestion: Remove sensitive fields from log statements
 patterns:
   - type: regex
-    pattern: '(?i)(log|logger|log4j|slf4j)\.\w+\([^)]*(password|token|secret|key|auth)[^)]*\)'
+    pattern: '(?i)(log|logger|log4j|slf4j)\.\w+\([^)]*(password|token|secret)[^)]*\)'
     comment: Possible sensitive data in log
+  - type: regex
+    pattern: '(?i)(log|logger|log4j|slf4j)\.\w+\([^)]*(api[_\s]?key|secret[_\s]?key|access[_\s]?token|bearer[_\s]?token)[^)]*\)'
+    comment: Possible API key or token in log
   - type: regex
     pattern: '(?i)System\.out\.print\(.*(password|token|secret)'
     comment: Possible sensitive data in print statement

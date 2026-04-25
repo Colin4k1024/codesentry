@@ -9,3 +9,6 @@ patterns:
   - type: regex
     pattern: '(log\.|console\.|fmt\.Print|print\()(.)*\b(password|token|secret)\b'
     comment: Possible sensitive data in log
+  - type: regex
+    pattern: '(log\.|console\.|fmt\.Print|print\()(.)*\b(api[_\s]?key|secret[_\s]?key|access[_\s]?token|bearer[_\s]?token)\b'
+    comment: Possible API key or token in log

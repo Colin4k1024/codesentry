@@ -8,8 +8,11 @@ languages:
 suggestion: Remove sensitive fields from log statements
 patterns:
   - type: regex
-    pattern: '(?i)log(ging)?\.(debug|info|warning|error|critical)\([^)]*(password|token|secret|key|auth)[^)]*\)'
+    pattern: '(?i)log(ging)?\.(debug|info|warning|error|critical)\([^)]*(password|token|secret)[^)]*\)'
     comment: Possible sensitive data in log
   - type: regex
-    pattern: 'print\(f?["\x27][^"\x27]*(password|token|secret|key|auth)[^"\x27]*["\x27]'
+    pattern: '(?i)log(ging)?\.(debug|info|warning|error|critical)\([^)]*(api[_\s]?key|secret[_\s]?key|access[_\s]?token|bearer[_\s]?token)[^)]*\)'
+    comment: Possible API key or token in log
+  - type: regex
+    pattern: 'print\(f?["\x27][^"\x27]*(password|token|secret)[^"\x27]*["\x27]'
     comment: Possible sensitive data in print statement

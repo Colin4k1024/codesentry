@@ -8,8 +8,8 @@ languages:
 suggestion: Use parameterized queries
 patterns:
   - type: regex
-    pattern: '(?i)(query|execute|run)\s*\([^)]*\+[^)]*\)'
-    comment: String concatenation in SQL query
+    pattern: '(?i)(query|execute|run)\s*\([^)]*(\+|&|\||%).*SELECT'
+    comment: SQL query with string concatenation or formatting
   - type: regex
-    pattern: 'format!\s*\([^)]*SELECT[^)]*\{'
-    comment: String formatting in SQL query
+    pattern: 'format!\s*\([^)]*SELECT.*\{.*\}.*\)'
+    comment: format! macro with SELECT and string interpolation
